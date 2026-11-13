@@ -1,0 +1,2026 @@
+<!--
+=== AUTO-SUMMARY START ===
+FILE: chat.html (Tổng: 1797 dòng code)
+[TỔNG QUAN & GIAO DIỆN]
+- Tiêu đề trang: "The Chat"
+- Biến CSS chính: --bg: #090a0c | --card-bg: #121418 | --card-border: #23272f | --accent-green: #00e676
+
+[ĐIỀU HƯỚNG & NÚT BẤM TƯƠNG TÁC]
+- [Dòng 981] <a.nav-esc-link>: '&lt; services.html' -> Tới: services.html
+- [Dòng 1088] <button#btnSend>: '' -> Gọi: handleUserSend()
+- [Dòng 1467] <button.btn-trash>: '🗑️' -> Gọi: deleteChatFromLib(event, ${item.id})
+
+[HÀM XỬ LÝ (SCRIPT)]
+- [Dòng 1166] Hàm: initAudio | Nhận vào: (không) | Trả về: void
+- [Dòng 1179] Hàm: playHoverBlip | Nhận vào: (không) | Trả về: void
+- [Dòng 1206] Hàm: playSuccessChime | Nhận vào: (không) | Trả về: void
+- [Dòng 1236] Hàm: playErrorBuzzer | Nhận vào: (không) | Trả về: void
+- [Dòng 1265] Hàm: forceUnlockAndTest | Nhận vào: (không) | Trả về: void
+- [Dòng 1273] DOM Listener: Gắn tương tác cho '.btn-home, .btn-lib-action, .btn-send-airplane'
+- [Dòng 1387] Hàm: getDB | Nhận vào: (không) | Trả về: INITIAL_CHATS
+- [Dòng 1396] Hàm: saveDB | Nhận vào: (list) | Trả về: void
+- [Dòng 1407] Hàm: goToHome | Nhận vào: (không) | Trả về: void
+- [Dòng 1415] Hàm: goToLibrary | Nhận vào: (isReadingMode = false) | Trả về: void
+- [Dòng 1429] Hàm: renderLibraryList | Nhận vào: (không) | Trả về: void
+- [Dòng 1467] Button (JSX): '🗑️'
+- [Dòng 1473] Hàm: selectChat | Nhận vào: (id) | Trả về: void
+- [Dòng 1481] Hàm: deleteChatFromLib | Nhận vào: (e, id) | Trả về: void
+- [Dòng 1493] Hàm: startSelectedOrRandomChat | Nhận vào: (không) | Trả về: void
+- [Dòng 1513] Alias hàm: activeTurnIndex = 0
+- [Dòng 1522] Hàm: openScriptModalForChat | Nhận vào: (chat) | Trả về: void
+- [Dòng 1543] Hàm: openScriptModal | Nhận vào: (không) | Trả về: void
+- [Dòng 1549] Hàm: closeScriptModal | Nhận vào: (không) | Trả về: void
+- [Dòng 1555] Hàm: confirmStartChatFromScript | Nhận vào: (không) | Trả về: void
+- [Dòng 1572] Hàm: proceedNextTurnInMessenger | Nhận vào: (không) | Trả về: void
+- [Dòng 1597] Hàm: renderNPCMessageBubble | Nhận vào: (speaker, text) | Trả về: (str || '')
+- [Dòng 1612] Hàm: renderUserMessageBubble | Nhận vào: (text) | Trả về: (str || '')
+- [Dòng 1623] Hàm: scrollToChatBottom | Nhận vào: (không) | Trả về: (str || '')
+- [Dòng 1630] Hàm: normalizePhrase | Nhận vào: (str) | Trả về: (str || '')
+- [Dòng 1639] Hàm: handleUserSend | Nhận vào: (không) | Trả về: `<span>${escapeHTML(w)}</span>...
+- [Dòng 1669] Hàm: showErrorFeedback | Nhận vào: (userInput, expectedText) | Trả về: `<span>${escapeHTML(w)}</span>...
+- [Dòng 1697] Hàm: clearErrorFeedback | Nhận vào: (không) | Trả về: void
+- [Dòng 1703] Hàm: handleHintClick | Nhận vào: (không) | Trả về: void
+- [Dòng 1712] Alias hàm: nextIndex = 0
+- [Dòng 1742] Hàm: finishMessengerChat | Nhận vào: (không) | Trả về: void
+- [Dòng 1748] Hàm: replayCurrentChat | Nhận vào: (không) | Trả về: void
+- [Dòng 1753] Hàm: deleteCurrentChat | Nhận vào: (không) | Trả về: void
+- [Dòng 1765] Hàm: openImportModal | Nhận vào: (không) | Trả về: void
+- [Dòng 1771] Hàm: closeImportModal | Nhận vào: (không) | Trả về: void
+- [Dòng 1775] Hàm: loadSampleImport | Nhận vào: (không) | Trả về: void
+- [Dòng 1806] Hàm: submitImportJson | Nhận vào: (không) | Trả về: (str || '').replace(/[&<>'"]/g...
+- [Dòng 1840] Hàm: escapeHTML | Nhận vào: (str) | Trả về: (str || '').replace(/[&<>'"]/g...
+=== AUTO-SUMMARY END ===
+-->
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Chat</title>
+  <style>
+    :root {
+      --bg: #090a0c;
+      --card-bg: #121418;
+      --card-border: #23272f;
+      --accent-green: #00e676;
+      --accent-green-glow: rgba(0, 230, 118, 0.25);
+      --accent-blue: #2979ff;
+      --text-main: #f0f2f5;
+      --text-muted: #8b949e;
+      --text-dim: #57606a;
+      --danger: #ff4d4f;
+      --bubble-bot: #161b22;
+      --bubble-user: #004d26;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow-x: hidden;
+      user-select: none;
+    }
+
+    /* Outer Wrapper */
+    .app-viewport {
+      width: 100%;
+      max-width: 920px;
+      min-height: 640px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      padding: 24px 20px;
+    }
+
+    /* Top Utility Bar */
+    .utility-bar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      font-size: 0.8rem;
+    }
+
+    .audio-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--accent-green);
+      background: rgba(0, 230, 118, 0.08);
+      border: 1px solid rgba(0, 230, 118, 0.3);
+      padding: 4px 10px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .audio-badge:hover {
+      background: rgba(0, 230, 118, 0.18);
+    }
+
+    .nav-esc-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 4px 10px;
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .nav-esc-link:hover {
+      color: #fff;
+      border-color: #555;
+    }
+
+    /* ==========================================================================
+       SCREEN 1: HOME VIEW (as sketched in Image 1)
+       - Heading: The chat
+       - Subtitle: this is where you will learn to speak any foreign language in the most natural way
+       - Buttons: Start chat, Start reading
+       - Big circular speech bubble illustration
+       - Signature in corner: by enix
+       ========================================================================== */
+    .screen-home {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 100%;
+      min-height: 580px;
+      border: 1.5px solid var(--card-border);
+      border-radius: 20px;
+      background: var(--card-bg);
+      padding: 48px 44px;
+      position: relative;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .home-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 36px;
+      flex: 1;
+    }
+
+    .home-left {
+      max-width: 460px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-title {
+      font-size: clamp(2.4rem, 4.5vw, 3.4rem);
+      font-weight: 700;
+      color: var(--text-main);
+      letter-spacing: -0.5px;
+      margin-bottom: 14px;
+    }
+
+    .brand-title span {
+      color: var(--accent-green);
+    }
+
+    .brand-subtitle {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 38px;
+    }
+
+    .home-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 100%;
+      max-width: 280px;
+    }
+
+    .btn-home {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px 24px;
+      border: 1.5px solid #3b82f6;
+      border-radius: 10px;
+      background: rgba(59, 130, 246, 0.08);
+      color: #60a5fa;
+      font-size: 1.15rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-home:hover {
+      background: #3b82f6;
+      color: #fff;
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-home.green {
+      border-color: var(--accent-green);
+      background: rgba(0, 230, 118, 0.08);
+      color: var(--accent-green);
+    }
+
+    .btn-home.green:hover {
+      background: var(--accent-green);
+      color: #000;
+      box-shadow: 0 8px 24px var(--accent-green-glow);
+    }
+
+
+
+/* Modern Chat Bubble (Theo hình số 2) */
+    .chat-bubble-illustration {
+      width: 240px;
+      height: 200px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: floatBubble 3.5s ease-in-out infinite;
+    }
+
+    .chat-bubble-illustration svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    @keyframes floatBubble {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .home-footer-credit {
+      text-align: right;
+      font-size: 0.95rem;
+      color: #43bb5f;
+      font-style: italic;
+      margin-top: 20px;
+    }
+
+    /* ==========================================================================
+       SCREEN 2: LIBRARY VIEW (as sketched in Image 2)
+       - Title: library
+       - List box: 1) Hotel Check-in, 2) Food, 3) ... (newest at top)
+       - Trash can icon next to each
+       - Click to start
+       - Buttons: [▷ Start!] and [➕ Import ?]
+       - [Back] button
+       ========================================================================== */
+    .screen-library {
+      display: none;
+      flex-direction: column;
+      width: 100%;
+      min-height: 580px;
+      border: 1.5px solid var(--card-border);
+      border-radius: 20px;
+      background: var(--card-bg);
+      padding: 36px 40px;
+      position: relative;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .lib-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .lib-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #9e263c;
+      letter-spacing: -0.5px;
+    }
+
+    .btn-back-pill {
+      background: transparent;
+      border: 1px solid #555;
+      color: var(--text-muted);
+      padding: 6px 16px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-back-pill:hover {
+      color: #fff;
+      border-color: #aaa;
+    }
+
+    /* Library List Box */
+    .lib-list-box {
+      width: 100%;
+      min-height: 270px;
+      max-height: 320px;
+      overflow-y: auto;
+      border: 1.5px solid #ff4d6d;
+      border-radius: 12px;
+      background: rgba(255, 77, 109, 0.02);
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .lib-list-box::-webkit-scrollbar {
+      width: 6px;
+    }
+    .lib-list-box::-webkit-scrollbar-thumb {
+      background: #444;
+      border-radius: 3px;
+    }
+
+    .lib-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .lib-item:hover {
+      background: rgba(255, 255, 255, 0.07);
+      border-color: rgba(255, 77, 109, 0.4);
+      transform: translateX(4px);
+    }
+
+    .lib-item.selected {
+      border-color: var(--accent-green);
+      background: rgba(0, 230, 118, 0.08);
+    }
+
+    .lib-item-title {
+      font-size: 1.05rem;
+      font-weight: 500;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .lib-item-tag {
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+    }
+
+    .btn-trash {
+      background: none;
+      border: none;
+      color: #ff4d6d;
+      font-size: 1.25rem;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      opacity: 0.75;
+      transition: all 0.2s;
+    }
+
+    .btn-trash:hover {
+      opacity: 1;
+      transform: scale(1.15);
+      color: #ff1744;
+    }
+
+    .lib-bottom-actions {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+    }
+
+    .btn-lib-action {
+      flex: 1;
+      max-width: 220px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1.5px solid var(--text-muted);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-main);
+      font-size: 1.15rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-lib-action:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .btn-lib-action.start {
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+      background: rgba(0, 230, 118, 0.08);
+    }
+
+    .btn-lib-action.start:hover {
+      background: var(--accent-green);
+      color: #000;
+      box-shadow: 0 8px 25px var(--accent-green-glow);
+    }
+
+    .btn-lib-action.import {
+      border-color: #60a5fa;
+      color: #60a5fa;
+      background: rgba(96, 165, 250, 0.08);
+    }
+
+    .btn-lib-action.import:hover {
+      background: #3b82f6;
+      color: #fff;
+    }
+
+    /* ==========================================================================
+       SCREEN 3: MODERN CHAT SCREEN (as sketched in Image 3)
+       - Clean messenger app interface, NO TERMINAL!
+       - NPC speech bubble with avatar 👤 Bob
+       - Native Vietnamese cue above user input: * "ồ tôi ổn, mà bạn đang đi đâu thế?"
+       - User avatar 👤 you
+       - Rounded input pill with send paper airplane button ➢
+       ========================================================================== */
+    .screen-chat {
+      display: none;
+      flex-direction: column;
+      width: 100%;
+      height: 640px;
+      border: 1.5px solid var(--card-border);
+      border-radius: 20px;
+      background: var(--card-bg);
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .chat-header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      background: rgba(0, 0, 0, 0.4);
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .chat-header-title {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .chat-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-recheck {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--accent-green);
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-recheck:hover {
+      background: rgba(0, 230, 118, 0.12);
+      border-color: var(--accent-green);
+    }
+
+    /* Message Bubbles Flow Area */
+    .chat-messages-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      scroll-behavior: smooth;
+    }
+
+    .chat-messages-area::-webkit-scrollbar {
+      width: 6px;
+    }
+    .chat-messages-area::-webkit-scrollbar-thumb {
+      background: #333;
+      border-radius: 3px;
+    }
+
+    /* Message Rows */
+    .msg-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      max-width: 80%;
+      animation: msgPop 0.25s ease;
+    }
+
+    @keyframes msgPop {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .msg-row.npc {
+      align-self: flex-start;
+    }
+
+    .msg-row.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    /* Avatars (circular as in drawing) */
+    .avatar-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #1c2128;
+      border: 1.5px solid #30363d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .avatar-circle.user-avatar {
+      background: #0d2818;
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    /* Message Bubble */
+    .msg-bubble {
+      padding: 14px 18px;
+      border-radius: 16px;
+      font-size: 1.05rem;
+      line-height: 1.5;
+      position: relative;
+    }
+
+    .msg-row.npc .msg-bubble {
+      background: var(--bubble-bot);
+      border: 1px solid var(--card-border);
+      color: #f0f6fc;
+      border-top-left-radius: 4px;
+    }
+
+    .msg-row.user .msg-bubble {
+      background: var(--bubble-user);
+      border: 1px solid rgba(0, 230, 118, 0.4);
+      color: #e6fffa;
+      border-top-right-radius: 4px;
+    }
+
+    .msg-author-name {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    /* Error / Retry Feedback Box */
+    .error-feedback-box {
+      align-self: center;
+      width: 100%;
+      max-width: 600px;
+      background: rgba(255, 77, 79, 0.08);
+      border: 1px solid rgba(255, 77, 79, 0.35);
+      border-radius: 12px;
+      padding: 14px 18px;
+      color: #ff7875;
+      font-size: 0.92rem;
+      line-height: 1.5;
+      animation: msgPop 0.25s ease;
+    }
+
+    .diff-wrong {
+      text-decoration: underline wavy var(--danger);
+      background: rgba(255, 77, 79, 0.2);
+      color: #ffa39e;
+      padding: 0 4px;
+      border-radius: 2px;
+    }
+
+    .correct-phrase-box {
+      color: #fff;
+      font-weight: 600;
+      margin-top: 6px;
+      padding: 4px 8px;
+      background: rgba(0, 230, 118, 0.12);
+      border-left: 3px solid var(--accent-green);
+      border-radius: 4px;
+    }
+
+    /* Bottom Input Bar Area (as sketched in Image 3) */
+    .chat-bottom-area {
+      padding: 16px 24px 20px;
+      background: rgba(0, 0, 0, 0.5);
+      border-top: 1px solid var(--card-border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* The Native Vietnamese Cue: * "ồ tôi ổn, mà bạn đang đi đâu thế?" */
+    .native-cue-banner {
+      font-size: 0.95rem;
+      color: var(--text-main);
+      font-style: italic;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding-left: 4px;
+    }
+
+    .cue-star {
+      color: #ffd600;
+      font-style: normal;
+      font-weight: bold;
+    }
+
+    .cue-text {
+      color: #ffd600;
+    }
+
+    .input-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Rounded Pill Input Box (as drawn) */
+    .pill-input-box {
+      flex: 1;
+      height: 52px;
+      border: 1.5px solid #444;
+      border-radius: 999px;
+      background: #090a0c;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.2s;
+    }
+
+    .pill-input-box:focus-within {
+      border-color: var(--accent-green);
+      box-shadow: 0 0 14px var(--accent-green-glow);
+    }
+
+    .chat-text-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-size: 1.05rem;
+      font-family: inherit;
+    }
+
+    .chat-text-input::placeholder {
+      color: #555;
+      font-size: 0.95rem;
+    }
+    /* Lớp phủ tô màu từng từ thời gian thực */
+    .input-highlight-wrapper {
+      position: relative;
+      flex: 1;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .input-backdrop {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      display: block; /* Dùng block thay vì flex để giữ nguyên khoảng trắng */
+      font-size: 1.05rem;
+      font-family: inherit;
+      letter-spacing: normal;
+      white-space: pre;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .chat-text-input.live-colored {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      color: transparent; /* Ẩn màu chữ gốc để lộ màu xanh/đỏ bên dưới */
+      caret-color: #fff;  /* Giữ con trỏ nhấp nháy màu trắng */
+    }
+
+    .chat-text-input.live-colored::selection {
+      background: rgba(0, 230, 118, 0.25);
+    }
+
+    .word-ok {
+      color: var(--accent-green);
+      font-weight: 500;
+    }
+
+    .word-err {
+      color: var(--danger);
+      text-decoration: underline wavy rgba(255, 77, 79, 0.6);
+    }
+
+    .btn-hint-inline {
+      background: rgba(255, 255, 255, 0.08);
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-hint-inline:hover {
+      background: rgba(0, 230, 118, 0.2);
+      color: var(--accent-green);
+    }
+
+    /* Send Button with Paper Airplane Icon (as sketched) */
+    .btn-send-airplane {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      border: 1.5px solid #444;
+      background: #14171d;
+      color: var(--accent-green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.3rem;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .btn-send-airplane:hover {
+      border-color: var(--accent-green);
+      background: var(--accent-green);
+      color: #000;
+      transform: scale(1.06);
+      box-shadow: 0 0 20px var(--accent-green-glow);
+    }
+
+    /* ==========================================================================
+       MODAL: FULL SCRIPT PREVIEW / RECHECK DIALOG
+       (Allows reviewing full dialogue script before starting or on "recheck",
+        then clicking OK clears the script so user is not distracted)
+       ========================================================================== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 680px;
+      max-height: 85vh;
+      background: #12151b;
+      border: 1.5px solid var(--card-border);
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+      overflow: hidden;
+      animation: modalFade 0.25s ease;
+    }
+
+    @keyframes modalFade {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--accent-green);
+    }
+
+    .modal-body {
+      padding: 20px 24px;
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      font-size: 0.98rem;
+    }
+
+    .script-turn-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 8px;
+      border-left: 3px solid var(--accent-blue);
+    }
+
+    .script-turn-item.is-user {
+      border-left-color: var(--accent-green);
+      background: rgba(0, 230, 118, 0.04);
+    }
+
+    .script-speaker {
+      font-size: 0.8rem;
+      font-weight: bold;
+      color: #93c5fd;
+    }
+
+    .script-turn-item.is-user .script-speaker {
+      color: var(--accent-green);
+    }
+
+    .script-target {
+      color: #fff;
+    }
+
+    .script-native {
+      color: #ffd600;
+      font-size: 0.9rem;
+      font-style: italic;
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--card-border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    .btn-modal-ok {
+      background: var(--accent-green);
+      color: #000;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-modal-ok:hover {
+      box-shadow: 0 0 20px var(--accent-green-glow);
+      transform: translateY(-1px);
+    }
+
+    /* Modal for Import Conversation */
+    .import-textarea {
+      width: 100%;
+      height: 180px;
+      background: #090a0c;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 12px;
+      color: #fff;
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      resize: vertical;
+      outline: none;
+    }
+
+    .import-textarea:focus {
+      border-color: var(--accent-blue);
+    }
+
+    /* Completion Overlay Card */
+    .finish-card-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.92);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+      z-index: 50;
+      text-align: center;
+    }
+
+    .finish-title {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--accent-green);
+      margin-bottom: 8px;
+    }
+
+    .finish-desc {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      margin-bottom: 28px;
+    }
+
+    .finish-actions {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-viewport">
+    
+    <!-- Top Utility Bar -->
+    <div class="utility-bar">
+      <div class="audio-badge" id="audioStatusBadge" onclick="forceUnlockAndTest()">
+        <span>🔊</span>
+        <span>SOUND: ACTIVE</span>
+      </div>
+      <a href="services.html" class="nav-esc-link">&lt; services.html</a>
+    </div>
+
+    <!-- ======================================================================
+         SCREEN 1: HOME VIEW (as in Image 1)
+         ====================================================================== -->
+    <div class="screen-home" id="screenHome">
+      <div class="home-content">
+        <div class="home-left">
+          <h1 class="brand-title">The <span>chat</span></h1>
+          <p class="brand-subtitle">
+            this is where you will learn to speak any foreign language in the most natural way
+          </p>
+
+          <div class="home-buttons">
+            <button class="btn-home green" id="btnHomeStartChat" onclick="goToLibrary()">Start chat</button>
+            <button class="btn-home" id="btnHomeStartReading" onclick="goToLibrary(true)">Start reading</button>
+          </div>
+        </div>
+
+<div class="home-right">
+          <div class="chat-bubble-illustration">
+            <svg viewBox="0 0 240 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <!-- Dải màu gradient từ xanh lá neon (#00e676) sang xanh dương (#3b82f6) -->
+                <linearGradient id="chatGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#00e676" />
+                  <stop offset="100%" stop-color="#3b82f6" />
+                </linearGradient>
+              </defs>
+
+              <!-- Khung viền bong bóng chat hở góc trên phải -->
+              <path d="M 168 35 H 55 C 32 35 20 47 20 70 V 130 C 20 153 32 165 55 165 H 62 V 188 L 95 165 H 175 C 198 165 210 153 210 130 V 75" 
+                    stroke="url(#chatGrad)" 
+                    stroke-width="11" 
+                    stroke-linecap="round" 
+                    stroke-linejoin="round" />
+
+              <!-- Dấu cộng (+) màu xanh dương ở góc trên bên phải -->
+              <path d="M 205 18 V 52 M 188 35 H 222" 
+                    stroke="#3b82f6" 
+                    stroke-width="11" 
+                    stroke-linecap="round" />
+
+              <!-- Chữ "Chat" màu xanh lá neon ở chính giữa -->
+              <text x="115" y="118" 
+                    fill="#00e676" 
+                    font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" 
+                    font-size="54" 
+                    font-weight="800" 
+                    text-anchor="middle" 
+                    letter-spacing="-1">Chat</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="home-footer-credit">by enix</div>
+    </div>
+
+    <!-- ======================================================================
+         SCREEN 2: LIBRARY VIEW (as in Image 2)
+         ====================================================================== -->
+    <div class="screen-library" id="screenLibrary">
+      <div class="lib-header">
+        <h2 class="lib-title">library</h2>
+        <button class="btn-back-pill" onclick="goToHome()">Back</button>
+      </div>
+
+      <!-- Scrollable list of conversations in DB -->
+      <div class="lib-list-box" id="libListBox">
+        <!-- Injected via JavaScript -->
+      </div>
+
+      <!-- Bottom action buttons as sketched -->
+      <div class="lib-bottom-actions">
+        <button class="btn-lib-action start" onclick="startSelectedOrRandomChat()">
+          <span>&#9655;</span>
+          <span>Start!</span>
+        </button>
+        <button class="btn-lib-action import" onclick="openImportModal()">
+          <span>&#10010;</span>
+          <span>Import ?</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         SCREEN 3: MODERN CHAT SCREEN (as in Image 3)
+         ====================================================================== -->
+    <div class="screen-chat" id="screenChat">
+      
+      <!-- Top chat bar -->
+      <div class="chat-header-bar">
+        <div class="chat-header-title">
+          <button class="btn-back-pill" onclick="goToLibrary()" style="margin-right: 8px;">&larr;</button>
+          <span id="chatHeaderTitle">Hotel Check-in</span>
+        </div>
+        <div class="chat-header-actions">
+          <button class="btn-recheck" onclick="openScriptModal()">
+            <span>📜</span>
+            <span>Recheck</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Messages Stream -->
+      <div class="chat-messages-area" id="chatMessagesArea">
+        <!-- Message bubbles dynamically injected -->
+      </div>
+
+      <!-- Bottom Input area as sketched in Image 3 -->
+      <div class="chat-bottom-area">
+        <!-- Native language cue -->
+        <div class="native-cue-banner" id="nativeCueBanner">
+          <span class="cue-star">*</span>
+          <span class="cue-text" id="cueText">"ồ tôi ổn, mà bạn đang đi đâu thế?"</span>
+        </div>
+
+        <div class="input-row">
+          <!-- User Avatar Circle -->
+          <div class="avatar-circle user-avatar">you</div>
+
+         <!-- Rounded Pill Input Box -->
+          <div class="pill-input-box">
+            <div class="input-highlight-wrapper">
+              <div id="inputBackdrop" class="input-backdrop"></div>
+              <input 
+                type="text" 
+                id="chatInput" 
+                class="chat-text-input live-colored" 
+                placeholder="Type your response in English..." 
+                autocomplete="off" 
+                spellcheck="false"
+              />
+            </div>
+            <button type="button" class="btn-hint-inline" onclick="handleHintClick()">Hint (Tab)</button>
+          </div>
+
+          <!-- Send Paper Airplane Button -->
+          <button type="button" class="btn-send-airplane" id="btnSend" onclick="handleUserSend()" aria-label="Send">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Completion Overlay Card -->
+      <div class="finish-card-overlay" id="finishOverlay">
+        <h3 class="finish-title">🎉 Great Job!</h3>
+        <p class="finish-desc">You completed this conversation successfully.</p>
+        <div class="finish-actions">
+          <button class="btn-lib-action start" onclick="replayCurrentChat()">Practice Again</button>
+          <button class="btn-lib-action" onclick="deleteCurrentChat()">Delete from DB</button>
+          <button class="btn-lib-action import" onclick="goToLibrary()">Library</button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ==========================================================================
+       MODAL 1: SCRIPT PREVIEW / RECHECK (Before starting or on recheck)
+       ========================================================================== -->
+  <div class="modal-overlay" id="scriptModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <span class="modal-title" id="scriptModalTitle">Conversation Script</span>
+        <button class="btn-back-pill" onclick="closeScriptModal()">✕</button>
+      </div>
+      <div class="modal-body" id="scriptModalBody">
+        <!-- Injected list of turns -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn-modal-ok" onclick="confirmStartChatFromScript()">Start Chat (OK)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL 2: IMPORT CONVERSATION DIALOG
+       ========================================================================== -->
+<div class="modal-overlay" id="importModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <span class="modal-title">Import New Conversation</span>
+        <button class="btn-back-pill" onclick="closeImportModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5;">
+          1. Choose your level, length &amp; topic, then copy this prompt into ChatGPT, Claude or Gemini:
+        </p>
+
+        <!-- Thanh chọn Trình độ, Độ dài & nhập Chủ đề -->
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+          <select id="promptLevelSelect" onchange="document.getElementById('dynLevel').textContent = this.value;" style="background: #090a0c; color: var(--accent-green); border: 1px solid var(--card-border); border-radius: 6px; padding: 8px 12px; font-size: 0.88rem; font-weight: 600; outline: none; cursor: pointer;">
+            <option value="A1">Level: A1 (Beginner)</option>
+            <option value="A2">Level: A2 (Elementary)</option>
+            <option value="B1" selected>Level: B1 (Intermediate)</option>
+            <option value="B2">Level: B2 (Upper-Inter)</option>
+            <option value="C1">Level: C1 (Advanced)</option>
+            <option value="C2">Level: C2 (Proficient)</option>
+          </select>
+
+          <select id="promptLengthSelect" onchange="document.getElementById('dynLength').textContent = this.value;" style="background: #090a0c; color: #60a5fa; border: 1px solid var(--card-border); border-radius: 6px; padding: 8px 12px; font-size: 0.88rem; font-weight: 600; outline: none; cursor: pointer;">
+            <option value="4">Length: 4 turns (Short)</option>
+            <option value="6">Length: 6 turns</option>
+            <option value="8" selected>Length: 8 turns (Medium)</option>
+            <option value="10">Length: 10 turns</option>
+            <option value="12">Length: 12 turns (Long)</option>
+            <option value="16">Length: 16 turns (Extended)</option>
+          </select>
+
+          <input type="text" id="promptTopicInput" oninput="document.getElementById('dynTopic').textContent = this.value.trim() || 'daily life';" placeholder="Enter topic (e.g., ordering coffee, job interview...)" style="flex: 1; min-width: 200px; background: #090a0c; color: #fff; border: 1px solid var(--card-border); border-radius: 6px; padding: 8px 12px; font-size: 0.88rem; outline: none;" />
+        </div>
+
+        <!-- Khung Prompt tự động cập nhật & có nút Copy -->
+        <div style="position: relative; background: rgba(255,255,255,0.04); padding: 12px 14px; border-radius: 6px; font-size: 0.85rem; color: var(--accent-green); border: 1px dashed var(--card-border); user-select: text; -webkit-user-select: text; line-height: 1.5;">
+          <button type="button" onclick="const t=document.getElementById('samplePromptText').innerText.replace(/\s+/g, ' ').trim(); navigator.clipboard.writeText(t); if(typeof playSuccessChime==='function') playSuccessChime(); this.textContent='Copied!'; this.style.background='var(--accent-green)'; this.style.color='#000'; setTimeout(()=>{this.textContent='Copy'; this.style.background='rgba(0, 230, 118, 0.15)'; this.style.color='var(--accent-green)';}, 1500);" style="position: absolute; top: 8px; right: 8px; background: rgba(0, 230, 118, 0.15); border: 1px solid var(--accent-green); color: var(--accent-green); border-radius: 4px; padding: 3px 8px; font-size: 0.75rem; cursor: pointer; font-weight: 600;">Copy</button>
+          <div id="samplePromptText" style="padding-right: 55px;">
+            Generate a natural, realistic <span id="dynLength" style="color: #ffd600; font-weight: bold;">8</span>-turn language learning conversation between 2 characters (Bob and Laura) in English (CEFR level <span id="dynLevel" style="color: #ffd600; font-weight: bold;">B1</span>) about "<span id="dynTopic" style="color: #ffd600; font-weight: bold;">daily life</span>". Return ONLY a valid raw JSON array (no markdown formatting, no code blocks, no extra explanation) using this exact schema: [{"speaker": "Name", "text_target": "Natural target language sentence", "text_native": "Natural Vietnamese translation", "is_player": false}]. Alternate turns between the NPC (is_player: false) and the learner (is_player: true).
+          </div>
+        </div>
+
+        <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-top: 2px;">
+          2. Paste the generated JSON dialogue below:
+        </p>
+        <textarea id="importJsonTextarea" class="import-textarea" placeholder="Paste dialogue JSON array here, or click 'Load Sample'..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-back-pill" onclick="loadSampleImport()">Load Sample</button>
+        <button class="btn-modal-ok" onclick="submitImportJson()">Import to Library</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ==========================================================================
+       1. SOUND EFFECTS SYNTHESIZER
+       - Hover blip
+       - Success chime ("tinh tinh")
+       - Error buzzer ("tè tè")
+       ========================================================================== */
+    const BLIP_SOUND_B64 = "data:audio/wav;base64,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";
+
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    ['click', 'pointerdown', 'keydown', 'touchstart'].forEach(evt => {
+      window.addEventListener(evt, () => initAudio());
+    });
+
+    function playHoverBlip() {
+      initAudio();
+      if (audioCtx && audioCtx.state === 'running') {
+        try {
+          const now = audioCtx.currentTime;
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(650, now);
+          osc.frequency.exponentialRampToValueAtTime(1150, now + 0.05);
+          gain.gain.setValueAtTime(0.18, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.06);
+          return;
+        } catch(e) {}
+      }
+      try {
+        const snd = new Audio(BLIP_SOUND_B64);
+        snd.volume = 0.25;
+        snd.play().catch(() => {});
+      } catch(e) {}
+    }
+
+    // Success sound: "tinh tinh"
+    function playSuccessChime() {
+      initAudio();
+      if (!audioCtx || audioCtx.state !== 'running') return;
+      try {
+        const now = audioCtx.currentTime;
+        const osc1 = audioCtx.createOscillator();
+        const gain1 = audioCtx.createGain();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(880, now);
+        gain1.gain.setValueAtTime(0.24, now);
+        gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+        osc1.connect(gain1);
+        gain1.connect(audioCtx.destination);
+        osc1.start(now);
+        osc1.stop(now + 0.14);
+
+        const osc2 = audioCtx.createOscillator();
+        const gain2 = audioCtx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(1320, now + 0.1);
+        gain2.gain.setValueAtTime(0.28, now + 0.1);
+        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+        osc2.connect(gain2);
+        gain2.connect(audioCtx.destination);
+        osc2.start(now + 0.1);
+        osc2.stop(now + 0.35);
+      } catch(e) {}
+    }
+
+    // Error sound: "tè tè"
+    function playErrorBuzzer() {
+      initAudio();
+      if (!audioCtx || audioCtx.state !== 'running') return;
+      try {
+        const now = audioCtx.currentTime;
+        const osc1 = audioCtx.createOscillator();
+        const gain1 = audioCtx.createGain();
+        osc1.type = 'sawtooth';
+        osc1.frequency.setValueAtTime(140, now);
+        gain1.gain.setValueAtTime(0.22, now);
+        gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.11);
+        osc1.connect(gain1);
+        gain1.connect(audioCtx.destination);
+        osc1.start(now);
+        osc1.stop(now + 0.11);
+
+        const osc2 = audioCtx.createOscillator();
+        const gain2 = audioCtx.createGain();
+        osc2.type = 'sawtooth';
+        osc2.frequency.setValueAtTime(125, now + 0.13);
+        gain2.gain.setValueAtTime(0.22, now + 0.13);
+        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+        osc2.connect(gain2);
+        gain2.connect(audioCtx.destination);
+        osc2.start(now + 0.13);
+        osc2.stop(now + 0.28);
+      } catch(e) {}
+    }
+
+    function forceUnlockAndTest() {
+      initAudio();
+      playSuccessChime();
+      const badge = document.getElementById('audioStatusBadge');
+      if (badge) badge.innerHTML = '<span>🔊</span><span>SOUND: TEST OK</span>';
+    }
+
+    // Hover sound listeners
+    document.querySelectorAll('.btn-home, .btn-lib-action, .btn-send-airplane').forEach(el => {
+      el.addEventListener('mouseenter', () => playHoverBlip());
+    });
+
+    /* ==========================================================================
+       2. DATABASE STORE
+       ========================================================================== */
+    const DB_KEY = 'THE_TERMINAL_CHAT_DB';
+
+    const INITIAL_CHATS = [
+      {
+        id: 1,
+        title: "Hotel Check-in",
+        target_lang: "english",
+        user_lang: "vietnamese",
+        rank: "B2",
+        about: "travel",
+        turns: [
+          {
+            speaker: "Receptionist",
+            text_target: "Welcome to the Grand Hotel, do you have a reservation with us?",
+            text_native: "Chào mừng quý khách đến Grand Hotel, quý khách đã đặt phòng trước chưa?",
+            is_player: false
+          },
+          {
+            speaker: "Emma",
+            text_target: "Yes, I booked a deluxe room under the name of Emma Watson.",
+            text_native: "Vâng, tôi đã đặt một phòng deluxe dưới tên Emma Watson.",
+            is_player: true
+          },
+          {
+            speaker: "Receptionist",
+            text_target: "Found it. Your room is on the fifth floor with an ocean view.",
+            text_native: "Đã tìm thấy. Phòng của bạn ở tầng năm với hướng nhìn ra biển.",
+            is_player: false
+          },
+          {
+            speaker: "Emma",
+            text_target: "Could you tell me what time breakfast is served tomorrow?",
+            text_native: "Bạn có thể cho tôi biết bữa sáng ngày mai phục vụ vào lúc mấy giờ không?",
+            is_player: true
+          }
+        ]
+      },
+      {
+        id: 2,
+        title: "Food & Restaurant",
+        target_lang: "english",
+        user_lang: "vietnamese",
+        rank: "A2",
+        about: "food",
+        turns: [
+          {
+            speaker: "Waiter",
+            text_target: "Hello! Are you ready to order your dinner?",
+            text_native: "Xin chào! Bạn đã sẵn sàng gọi món cho bữa tối chưa?",
+            is_player: false
+          },
+          {
+            speaker: "Alex",
+            text_target: "Yes, I would like the grilled salmon with asparagus, please.",
+            text_native: "Vâng, cho tôi món cá hồi nướng măng tây nhé.",
+            is_player: true
+          },
+          {
+            speaker: "Waiter",
+            text_target: "Excellent choice. Would you like anything to drink?",
+            text_native: "Lựa chọn tuyệt vời. Bạn có muốn dùng đồ uống gì không?",
+            is_player: false
+          },
+          {
+            speaker: "Alex",
+            text_target: "Just sparkling water with a slice of lemon for me.",
+            text_native: "Cho tôi một ly nước khoáng có ga kèm lát chanh là được.",
+            is_player: true
+          }
+        ]
+      },
+      {
+        id: 3,
+        title: "Work & Project Update",
+        target_lang: "english",
+        user_lang: "vietnamese",
+        rank: "B1",
+        about: "work",
+        turns: [
+          {
+            speaker: "Bob",
+            text_target: "Hi, how are you today?",
+            text_native: "Chào bạn, hôm nay bạn thế nào?",
+            is_player: false
+          },
+          {
+            speaker: "Laura",
+            text_target: "Oh, I am just fine, where are you heading to?",
+            text_native: "Ồ tôi ổn, mà bạn đang đi đâu thế?",
+            is_player: true
+          },
+          {
+            speaker: "Bob",
+            text_target: "I am going to the meeting room for the quarterly review.",
+            text_native: "Tôi đang đến phòng họp để dự cuộc đánh giá quý.",
+            is_player: false
+          },
+          {
+            speaker: "Laura",
+            text_target: "Good luck with your presentation, let us catch up later.",
+            text_native: "Chúc bài thuyết trình may mắn nhé, lát gặp lại sau.",
+            is_player: true
+          }
+        ]
+      }
+    ];
+
+    function getDB() {
+      try {
+        const stored = localStorage.getItem(DB_KEY);
+        if (stored) return JSON.parse(stored);
+      } catch(e) {}
+      localStorage.setItem(DB_KEY, JSON.stringify(INITIAL_CHATS));
+      return INITIAL_CHATS;
+    }
+
+    function saveDB(list) {
+      localStorage.setItem(DB_KEY, JSON.stringify(list));
+    }
+
+    /* ==========================================================================
+       3. NAVIGATION BETWEEN THE 3 SCREENS
+       ========================================================================== */
+    const screenHome = document.getElementById('screenHome');
+    const screenLibrary = document.getElementById('screenLibrary');
+    const screenChat = document.getElementById('screenChat');
+
+    function goToHome() {
+      playHoverBlip();
+      screenHome.style.display = 'flex';
+      screenLibrary.style.display = 'none';
+      screenChat.style.display = 'none';
+      closeScriptModal();
+    }
+
+    function goToLibrary(isReadingMode = false) {
+      playHoverBlip();
+      screenHome.style.display = 'none';
+      screenLibrary.style.display = 'flex';
+      screenChat.style.display = 'none';
+      closeScriptModal();
+      renderLibraryList();
+    }
+
+    /* ==========================================================================
+       4. LIBRARY CONTROLLER (Screen 2)
+       ========================================================================== */
+    let selectedChatId = null;
+
+    function renderLibraryList() {
+      const libListBox = document.getElementById('libListBox');
+      const db = getDB();
+
+      // Sort with newest chats at the top ("chat mới nhất nằm ở đầu")
+      const list = [...db].reverse();
+
+      if (list.length === 0) {
+        libListBox.innerHTML = `
+          <div style="text-align: center; color: var(--text-muted); padding: 40px 0;">
+            No conversations in library.<br>Click <b>[➕ Import ?]</b> to add one!
+          </div>
+        `;
+        selectedChatId = null;
+        return;
+      }
+
+      if (!selectedChatId && list.length > 0) {
+        selectedChatId = list[0].id;
+      }
+
+      libListBox.innerHTML = '';
+      list.forEach((item, idx) => {
+        const row = document.createElement('div');
+        row.className = `lib-item ${item.id === selectedChatId ? 'selected' : ''}`;
+        row.onclick = () => {
+          selectChat(item.id);
+        };
+
+        const target = (item.target_lang || 'English').toUpperCase();
+        const rank = item.rank || 'B1';
+
+        row.innerHTML = `
+          <div class="lib-item-title">
+            <span>${idx + 1})</span>
+            <span>${escapeHTML(item.title)}</span>
+            <span class="lib-item-tag">${target} ${rank}</span>
+          </div>
+          <button class="btn-trash" onclick="deleteChatFromLib(event, ${item.id})" title="Delete conversation">🗑️</button>
+        `;
+        libListBox.appendChild(row);
+      });
+    }
+
+    function selectChat(id) {
+      playHoverBlip();
+      selectedChatId = id;
+      renderLibraryList();
+      // Click on chat directly starts it as requested in sketch: "click vào chat để bắt đầu"
+      startSelectedOrRandomChat();
+    }
+
+    function deleteChatFromLib(e, id) {
+      e.stopPropagation();
+      playHoverBlip();
+      let db = getDB();
+      db = db.filter(item => item.id !== id);
+      saveDB(db);
+      if (selectedChatId === id) {
+        selectedChatId = db.length > 0 ? db[db.length - 1].id : null;
+      }
+      renderLibraryList();
+    }
+
+    function startSelectedOrRandomChat() {
+      const db = getDB();
+      if (!db || db.length === 0) {
+        openImportModal();
+        return;
+      }
+
+      let chat = db.find(c => c.id === selectedChatId);
+      if (!chat) {
+        chat = db[db.length - 1]; // newest
+      }
+
+      // Open Script Preview Modal first (so user reviews full script, then clicks OK to clear distraction and practice!)
+      openScriptModalForChat(chat);
+    }
+
+    /* ==========================================================================
+       5. CHAT CONTROLLER & ROLEPLAY GAME LOGIC (Screen 3)
+       ========================================================================== */
+    let activeChat = null;
+    let activeTurnIndex = 0;
+
+    const chatHeaderTitle = document.getElementById('chatHeaderTitle');
+    const chatMessagesArea = document.getElementById('chatMessagesArea');
+    const nativeCueBanner = document.getElementById('nativeCueBanner');
+    const cueText = document.getElementById('cueText');
+    const chatInput = document.getElementById('chatInput');
+    const finishOverlay = document.getElementById('finishOverlay');
+
+    function openScriptModalForChat(chat) {
+      activeChat = chat;
+      document.getElementById('scriptModalTitle').textContent = `Script: ${chat.title} (${(chat.target_lang || 'English').toUpperCase()})`;
+      
+      const modalBody = document.getElementById('scriptModalBody');
+      modalBody.innerHTML = '';
+
+      chat.turns.forEach(turn => {
+        const item = document.createElement('div');
+        item.className = `script-turn-item ${turn.is_player ? 'is-user' : ''}`;
+        item.innerHTML = `
+          <div class="script-speaker">${escapeHTML(turn.speaker)} ${turn.is_player ? '(YOU)' : ''}</div>
+          <div class="script-target">${escapeHTML(turn.text_target)}</div>
+          <div class="script-native">"${escapeHTML(turn.text_native)}"</div>
+        `;
+        modalBody.appendChild(item);
+      });
+
+      document.getElementById('scriptModal').style.display = 'flex';
+    }
+
+    function openScriptModal() {
+      if (activeChat) {
+        openScriptModalForChat(activeChat);
+      }
+    }
+
+    function closeScriptModal() {
+      document.getElementById('scriptModal').style.display = 'none';
+    }
+
+    // When user clicks "Start Chat (OK)" in script preview modal:
+    // It clears the script so user is not distracted and starts the messenger practice!
+    function confirmStartChatFromScript() {
+      playSuccessChime();
+      closeScriptModal();
+
+      // Show Chat View (Screen 3)
+      screenHome.style.display = 'none';
+      screenLibrary.style.display = 'none';
+      screenChat.style.display = 'flex';
+      finishOverlay.style.display = 'none';
+
+      chatHeaderTitle.textContent = activeChat.title;
+      chatMessagesArea.innerHTML = '';
+      activeTurnIndex = 0;
+
+      proceedNextTurnInMessenger();
+    }
+
+    function proceedNextTurnInMessenger() {
+      if (!activeChat || activeTurnIndex >= activeChat.turns.length) {
+        finishMessengerChat();
+        return;
+      }
+
+      const turn = activeChat.turns[activeTurnIndex];
+
+      if (!turn.is_player) {
+        // NPC Turn
+        setTimeout(() => {
+          renderNPCMessageBubble(turn.speaker, turn.text_target);
+          activeTurnIndex++;
+          proceedNextTurnInMessenger();
+        }, 350);
+      } else {
+        // Player Turn: Show Native Cue above the input bar as drawn in Image 3
+        nativeCueBanner.style.display = 'flex';
+        cueText.textContent = `"${turn.text_native}"`;
+        chatInput.value = '';
+        chatInput.focus();
+        scrollToChatBottom();
+      }
+    }
+
+    function renderNPCMessageBubble(speaker, text) {
+      playHoverBlip();
+      const row = document.createElement('div');
+      row.className = 'msg-row npc';
+      row.innerHTML = `
+        <div class="avatar-circle">👤</div>
+        <div class="msg-bubble">
+          <div class="msg-author-name">${escapeHTML(speaker)}</div>
+          <div>${escapeHTML(text)}</div>
+        </div>
+      `;
+      chatMessagesArea.appendChild(row);
+      scrollToChatBottom();
+    }
+
+    function renderUserMessageBubble(text) {
+      const row = document.createElement('div');
+      row.className = 'msg-row user';
+      row.innerHTML = `
+        <div class="avatar-circle user-avatar">you</div>
+        <div class="msg-bubble">${escapeHTML(text)}</div>
+      `;
+      chatMessagesArea.appendChild(row);
+      scrollToChatBottom();
+    }
+
+    function scrollToChatBottom() {
+      requestAnimationFrame(() => {
+        chatMessagesArea.scrollTop = chatMessagesArea.scrollHeight;
+      });
+    }
+
+    // Normalizing text: ignores punctuation ' . , ? ! " : ; and case
+    function normalizePhrase(str) {
+      return (str || '')
+        .toLowerCase()
+        .replace(/['".,?!:;]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    // User sends response
+// User sends response
+    function handleUserSend() {
+      const userInput = chatInput.value.trim();
+      if (!userInput) return;
+
+      const turn = activeChat.turns[activeTurnIndex];
+      const normalizedUser = normalizePhrase(userInput);
+      const normalizedExpected = normalizePhrase(turn.text_target);
+
+      // Rule: missing punctuation ' . , ? ! is NOT counted as an error
+      if (normalizedUser === normalizedExpected) {
+        // CORRECT ANSWER -> "tinh tinh" sound chime!
+        playSuccessChime();
+        renderUserMessageBubble(turn.text_target); // Render formatted response
+        chatInput.value = '';
+        updateLiveInputHighlight();
+
+        // Clear any previous error box
+        clearErrorFeedback();
+
+        activeTurnIndex++;
+        proceedNextTurnInMessenger();
+      } else {
+        // INCORRECT ANSWER -> "tè tè" buzz sound!
+        playErrorBuzzer();
+
+        // Render error diff box with red wavy underline
+        showErrorFeedback(userInput, turn.text_target);
+
+        // Giữ lại phần các từ đầu đã gõ đúng, xóa phần sai trở về sau để gõ tiếp
+        const userWords = userInput.split(/\s+/);
+        const expectedWords = turn.text_target.split(/\s+/);
+        let correctPrefix = [];
+
+        for (let i = 0; i < userWords.length; i++) {
+          if (i < expectedWords.length && normalizePhrase(userWords[i]) === normalizePhrase(expectedWords[i])) {
+            correctPrefix.push(expectedWords[i]);
+          } else {
+            break; // Dừng lại ngay tại từ đầu tiên bị sai
+          }
+        }
+
+        chatInput.value = correctPrefix.length > 0 ? correctPrefix.join(' ') + ' ' : '';
+        chatInput.focus();
+      }
+    }
+
+let errorTimeoutId = null;
+
+    function showErrorFeedback(userInput, expectedText) {
+      clearErrorFeedback();
+
+      const userWords = userInput.split(/\s+/);
+      const expectedWords = expectedText.split(/\s+/);
+
+      const diffHTML = userWords.map((w, idx) => {
+        const normUser = normalizePhrase(w);
+        const normExp = normalizePhrase(expectedWords[idx] || '');
+        if (normUser === normExp) {
+          return `<span>${escapeHTML(w)}</span>`;
+        } else {
+          return `<span class="diff-wrong">${escapeHTML(w)}</span>`;
+        }
+      }).join(' ');
+
+      const errBox = document.createElement('div');
+      errBox.id = 'activeErrorBox';
+      errBox.className = 'error-feedback-box';
+      errBox.innerHTML = `
+        <div><b>Incorrect phrase:</b> ${diffHTML}</div>
+        <div class="correct-phrase-box">Correct sentence: "${escapeHTML(expectedText)}"</div>
+        <div style="font-size: 0.8rem; color: #ff7875; margin-top: 4px;">Please re-enter your response accurately. (Hiding in 5s...)</div>
+      `;
+      chatMessagesArea.appendChild(errBox);
+      scrollToChatBottom();
+
+      // Tự động ẩn gợi ý sau 5 giây
+      errorTimeoutId = setTimeout(() => {
+        clearErrorFeedback();
+      }, 3000);
+    }
+
+    function clearErrorFeedback() {
+      if (errorTimeoutId) {
+        clearTimeout(errorTimeoutId);
+        errorTimeoutId = null;
+      }
+      const oldBox = document.getElementById('activeErrorBox');
+      if (oldBox) oldBox.remove();
+    }
+
+    function clearErrorFeedback() {
+      const oldBox = document.getElementById('activeErrorBox');
+      if (oldBox) oldBox.remove();
+    }
+
+    // Tab key / Hint button: auto-fill next correct word
+    function handleHintClick() {
+      if (!activeChat) return;
+      const turn = activeChat.turns[activeTurnIndex];
+      if (!turn || !turn.is_player) return;
+
+      playHoverBlip();
+      const expectedWords = turn.text_target.split(/\s+/);
+      const currentWords = chatInput.value.trim().split(/\s+/).filter(Boolean);
+
+      let nextIndex = 0;
+      for (let i = 0; i < currentWords.length; i++) {
+        if (normalizePhrase(currentWords[i]) === normalizePhrase(expectedWords[i])) {
+          nextIndex = i + 1;
+        } else {
+          break;
+        }
+      }
+
+      if (nextIndex < expectedWords.length) {
+        const hintedWords = expectedWords.slice(0, nextIndex + 1).join(' ');
+        chatInput.value = hintedWords + ' ';
+      } else {
+        chatInput.value = turn.text_target;
+      }
+      chatInput.focus();
+    }
+const inputBackdrop = document.getElementById('inputBackdrop');
+
+    function updateLiveInputHighlight() {
+      if (!inputBackdrop) return;
+      const val = chatInput.value;
+
+      // Ẩn placeholder khi đang có chữ để không bị đè chữ
+      chatInput.placeholder = val.length > 0 ? '' : 'Type your response in English...';
+
+      if (!val || !activeChat) {
+        inputBackdrop.innerHTML = '';
+        return;
+      }
+
+      const turn = activeChat.turns[activeTurnIndex];
+      if (!turn || !turn.is_player) {
+        inputBackdrop.innerHTML = escapeHTML(val).replace(/ /g, '&nbsp;');
+        return;
+      }
+
+      const expectedWords = turn.text_target.split(/\s+/);
+      const tokens = val.split(/(\s+)/);
+      let wordIdx = 0;
+
+      const html = tokens.map(token => {
+        if (/^\s+$/.test(token)) {
+          // Chuyển dấu cách thành &nbsp; để trình duyệt luôn giữ đúng độ rộng khoảng trắng
+          return token.replace(/ /g, '&nbsp;');
+        }
+        const normTyped = normalizePhrase(token);
+        const normExp = normalizePhrase(expectedWords[wordIdx] || '');
+        const isLastToken = (val.trimEnd() === val) && (wordIdx === val.trim().split(/\s+/).length - 1);
+
+        let isMatch = false;
+        if (normTyped === normExp && normExp !== '') {
+          isMatch = true;
+        } else if (isLastToken && normExp.startsWith(normTyped) && normTyped !== '') {
+          isMatch = true;
+        }
+
+        wordIdx++;
+        return `<span class="${isMatch ? 'word-ok' : 'word-err'}">${escapeHTML(token)}</span>`;
+      }).join('');
+
+      inputBackdrop.innerHTML = html;
+      inputBackdrop.scrollLeft = chatInput.scrollLeft;
+    }
+
+    chatInput.addEventListener('input', updateLiveInputHighlight);
+    chatInput.addEventListener('scroll', () => {
+      if (inputBackdrop) inputBackdrop.scrollLeft = chatInput.scrollLeft;
+    });
+    // Keyboard Listeners in Chat Input
+    chatInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        handleHintClick();
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        handleUserSend();
+      }
+    });
+
+    // Finish session
+    function finishMessengerChat() {
+      playSuccessChime();
+      nativeCueBanner.style.display = 'none';
+      finishOverlay.style.display = 'flex';
+    }
+
+    function replayCurrentChat() {
+      finishOverlay.style.display = 'none';
+      confirmStartChatFromScript();
+    }
+
+    function deleteCurrentChat() {
+      if (activeChat) {
+        let db = getDB();
+        db = db.filter(c => c.id !== activeChat.id);
+        saveDB(db);
+      }
+      goToLibrary();
+    }
+
+    /* ==========================================================================
+       6. IMPORT MODAL CONTROLLER
+       ========================================================================== */
+    function openImportModal() {
+      playHoverBlip();
+      document.getElementById('importJsonTextarea').value = '';
+      document.getElementById('importModal').style.display = 'flex';
+    }
+
+    function closeImportModal() {
+      document.getElementById('importModal').style.display = 'none';
+    }
+
+    function loadSampleImport() {
+      playHoverBlip();
+      const sample = [
+        {
+          speaker: "Cashier",
+          text_target: "Did you find everything you were looking for today?",
+          text_native: "Hôm nay bạn đã tìm thấy mọi thứ mình cần chưa?",
+          is_player: false
+        },
+        {
+          speaker: "Customer",
+          text_target: "Yes, everything was great. Do you take credit cards?",
+          text_native: "Vâng, mọi thứ đều tốt. Cửa hàng có nhận thẻ tín dụng không?",
+          is_player: true
+        },
+        {
+          speaker: "Cashier",
+          text_target: "Yes we do, please tap your card on the terminal.",
+          text_native: "Có ạ, xin mời bạn chạm thẻ vào máy thanh toán.",
+          is_player: false
+        },
+        {
+          speaker: "Customer",
+          text_target: "Done. Could I also get a paper receipt?",
+          text_native: "Xong rồi. Tôi có thể lấy hóa đơn giấy được không?",
+          is_player: true
+        }
+      ];
+      document.getElementById('importJsonTextarea').value = JSON.stringify(sample, null, 2);
+    }
+
+    function submitImportJson() {
+      const raw = document.getElementById('importJsonTextarea').value.trim();
+      if (!raw) return;
+
+      try {
+        const turns = JSON.parse(raw);
+        if (!Array.isArray(turns) || turns.length === 0) {
+          throw new Error('JSON must be an array of dialogue turns.');
+        }
+
+const db = getDB();
+        const newId = (db.length > 0 ? Math.max(...db.map(x => x.id || 0)) : 0) + 1;
+        const firstSentence = (turns[0] && turns[0].text_target) ? turns[0].text_target.trim() : `Imported Chat #${newId}`;
+        const selectedRank = document.getElementById('promptLevelSelect')?.value || "B1";
+
+        const newChat = {
+          id: newId,
+          title: firstSentence,
+          target_lang: "english",
+          user_lang: "vietnamese",
+          rank: selectedRank,
+          about: "custom",
+          turns: turns
+        };
+
+        db.push(newChat);
+        saveDB(db);
+
+        playSuccessChime();
+        closeImportModal();
+        selectedChatId = newId;
+        renderLibraryList();
+      } catch(err) {
+        alert('Invalid JSON: ' + err.message);
+      }
+    }
+
+    function escapeHTML(str) {
+      return (str || '').replace(/[&<>'"]/g, tag => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#39;',
+        '"': '&quot;'
+      }[tag] || tag));
+    }
+  </script>
+</body>
+</html>

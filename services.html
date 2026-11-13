@@ -1,0 +1,508 @@
+<!--
+=== AUTO-SUMMARY START ===
+FILE: services.html (Tổng: 489 dòng code)
+[TỔNG QUAN & GIAO DIỆN]
+- Tiêu đề trang: "the terminal"
+- Biến CSS chính: --bg: #030405 | --container-bg: #070908 | --green: #00ff77 | --green-glow: rgba(0, 255, 119, 0.45)
+
+[ĐIỀU HƯỚNG & NÚT BẤM TƯƠNG TÁC]
+- [Dòng 349] <a.btn-esc>: '&lt; ESC // ROOT &gt;' -> Tới: index.html
+
+[HÀM XỬ LÝ (SCRIPT)]
+- [Dòng 440] Hàm: initAudio | Nhận vào: (không) | Trả về: void
+- [Dòng 456] Hàm: playHoverBlip | Nhận vào: (không) | Trả về: void
+- [Dòng 488] Hàm: forceUnlockAndTest | Nhận vào: (không) | Trả về: void
+- [Dòng 495] Alias hàm: playBeep = playHoverBlip
+- [Dòng 498] DOM Listener: Gắn tương tác cho '.card-link'
+=== AUTO-SUMMARY END ===
+-->
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>the terminal</title>
+  <style>
+    :root {
+      --bg: #030405;
+      --container-bg: #070908;
+      --green: #00ff77;
+      --green-glow: rgba(0, 255, 119, 0.45);
+      --green-subtle: rgba(0, 255, 119, 0.08);
+      --green-border: rgba(0, 255, 119, 0.85);
+      --font-game: "Fira Code", "JetBrains Mono", "Courier New", Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--green);
+      font-family: var(--font-game);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      position: relative;
+      overflow-x: hidden;
+      user-select: none;
+    }
+
+    /* Ambient CRT Scanline Overlay */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0),
+        rgba(255, 255, 255, 0) 50%,
+        rgba(0, 0, 0, 0.35) 50%,
+        rgba(0, 0, 0, 0.35)
+      );
+      background-size: 100% 4px;
+      pointer-events: none;
+      z-index: 99;
+      opacity: 0.65;
+    }
+
+    /* Subtle background grid */
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: 
+        radial-gradient(circle at 50% 50%, transparent 60%, rgba(0, 0, 0, 0.9) 100%),
+        linear-gradient(rgba(0, 255, 119, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 119, 0.025) 1px, transparent 1px);
+      background-size: 100% 100%, 36px 36px, 36px 36px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Top Return Button */
+    .top-nav {
+      width: 100%;
+      max-width: 980px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .audio-badge {
+      font-size: 0.75rem;
+      letter-spacing: 1px;
+      color: var(--green);
+      border: 1px solid var(--green);
+      padding: 5px 12px;
+      border-radius: 4px;
+      background: rgba(0, 255, 119, 0.06);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .audio-badge:hover {
+      background: var(--green);
+      color: #000;
+      box-shadow: 0 0 12px var(--green-glow);
+    }
+
+    .btn-esc {
+      color: var(--green);
+      text-decoration: none;
+      font-size: 0.78rem;
+      border: 1px solid var(--green-border);
+      padding: 6px 14px;
+      border-radius: 6px;
+      background: rgba(0, 255, 119, 0.05);
+      transition: all 0.2s ease;
+      letter-spacing: 1px;
+    }
+
+    .btn-esc:hover {
+      background: var(--green);
+      color: #000;
+      box-shadow: 0 0 15px var(--green-glow);
+    }
+
+    /* Main Container: Green-Bordered with rounded corners */
+    .terminal-container {
+      position: relative;
+      width: 100%;
+      max-width: 980px;
+      background: var(--container-bg);
+      border: 1.5px solid var(--green);
+      border-radius: 20px;
+      box-shadow: 
+        0 0 30px rgba(0, 255, 119, 0.15),
+        inset 0 0 35px rgba(0, 255, 119, 0.03);
+      padding: 36px 40px 40px;
+      display: flex;
+      flex-direction: column;
+      z-index: 2;
+    }
+
+    /* Top-left label inside the container: 'the terminal' */
+    .terminal-title-label {
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: var(--green);
+      letter-spacing: 1.5px;
+      margin-bottom: 30px;
+      text-shadow: 0 0 8px rgba(0, 255, 119, 0.5);
+    }
+
+    /* Scrollable Cards Wrapper with Right-side Scroll Indicator */
+    .scroll-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+      max-width: 820px;
+      margin: 0 auto;
+    }
+
+    /* Vertically Scrollable List of Cards */
+    .cards-scroll-container {
+      width: 100%;
+      max-height: 440px;
+      overflow-y: auto;
+      padding: 12px 28px 12px 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      scroll-behavior: smooth;
+    }
+
+    /* Custom Green Scrollbar */
+    .cards-scroll-container::-webkit-scrollbar {
+      width: 6px;
+    }
+    .cards-scroll-container::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 3px;
+    }
+    .cards-scroll-container::-webkit-scrollbar-thumb {
+      background: var(--green);
+      border-radius: 3px;
+      box-shadow: 0 0 8px var(--green);
+    }
+
+    /* Card Item (All cards share the exact same style) */
+    .card-link {
+      position: relative;
+      width: 100%;
+      min-height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      cursor: pointer;
+      color: inherit;
+      outline: none;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), filter 0.25s ease;
+    }
+
+    /* SVG Border Layer inside each card */
+    .card-svg-frame {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      pointer-events: none;
+    }
+
+    /* Normal state: standard rectangular green outline */
+    .poly-normal {
+      fill: rgba(5, 10, 8, 0.88);
+      stroke: var(--green);
+      stroke-width: 1.5px;
+      opacity: 1;
+      transition: opacity 0.2s ease, fill 0.2s ease;
+    }
+
+    /* Hover state: slanted left edge ('cạnh trái bị cắt xén') */
+    .poly-hover {
+      fill: rgba(0, 255, 119, 0.12);
+      stroke: #66ffaa;
+      stroke-width: 2px;
+      opacity: 0;
+      transition: opacity 0.2s ease, fill 0.2s ease;
+    }
+
+    /* Text inside card */
+    .card-content {
+      position: relative;
+      z-index: 1;
+      font-size: clamp(1.2rem, 2.4vw, 1.6rem);
+      font-weight: 600;
+      color: var(--green);
+      letter-spacing: 2px;
+      transition: all 0.2s ease;
+      text-shadow: 0 0 6px rgba(0, 255, 119, 0.4);
+    }
+
+    /* HOVER EFFECT:
+       1. Left edge is cut/slanted (poly-hover visible)
+       2. Card scales up / gets bigger ('hover to lên')
+       3. Green glow intensifies
+    */
+    .card-link:hover {
+      transform: scale(1.035);
+      z-index: 10;
+      filter: drop-shadow(0 6px 20px rgba(0, 255, 119, 0.45));
+    }
+
+    .card-link:hover .poly-normal {
+      opacity: 0;
+    }
+
+    .card-link:hover .poly-hover {
+      opacity: 1;
+    }
+
+    .card-link:hover .card-content {
+      color: #ffffff;
+      text-shadow: 
+        0 0 10px var(--green),
+        0 0 22px rgba(0, 255, 119, 0.85);
+      letter-spacing: 2.5px;
+    }
+
+    /* Right-side scroll arrows (as depicted in the drawing with ↑ and ↓) */
+    .scroll-indicator {
+      position: absolute;
+      right: 4px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      color: var(--green);
+      opacity: 0.8;
+      pointer-events: none;
+    }
+
+    .scroll-arrow {
+      font-size: 1.3rem;
+      line-height: 1;
+      animation: floatArrow 2s infinite ease-in-out;
+      text-shadow: 0 0 8px var(--green);
+    }
+
+    .scroll-arrow.down {
+      animation: floatArrowDown 2s infinite ease-in-out;
+      animation-delay: 1s;
+    }
+
+    .scroll-line {
+      width: 1.5px;
+      height: 90px;
+      background: linear-gradient(
+        to bottom,
+        var(--green),
+        transparent 50%,
+        var(--green)
+      );
+      box-shadow: 0 0 6px var(--green);
+    }
+
+    @keyframes floatArrow {
+      0%, 100% { transform: translateY(0); opacity: 0.6; }
+      50% { transform: translateY(-4px); opacity: 1; }
+    }
+
+    @keyframes floatArrowDown {
+      0%, 100% { transform: translateY(0); opacity: 0.6; }
+      50% { transform: translateY(4px); opacity: 1; }
+    }
+
+    /* Bottom subtle game hint */
+    .terminal-footer-hint {
+      text-align: center;
+      margin-top: 26px;
+      font-size: 0.75rem;
+      color: rgba(0, 255, 119, 0.5);
+      letter-spacing: 1.5px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Exit Navigation Bar -->
+  <div class="top-nav">
+    <div class="audio-badge" id="audioStatusBadge" onclick="forceUnlockAndTest()">[ 🔊 SOUND: ACTIVE ]</div>
+    <a href="index.html" class="btn-esc">&lt; ESC // ROOT &gt;</a>
+  </div>
+
+  <!-- Main Container: Green-Bordered labeled 'the terminal' in top-left -->
+  <div class="terminal-container">
+
+    <!-- Top-left label inside the container -->
+    <div class="terminal-title-label">the terminal</div>
+
+    <!-- Vertically Scrollable List of Cards -->
+    <div class="scroll-wrapper">
+      <div class="cards-scroll-container" id="cardsScrollContainer">
+
+        <!-- Card 1: 'The chat' (leading to chat.html) -->
+        <a href="chat.html" class="card-link" onclick="playBeep()">
+          <svg class="card-svg-frame" viewBox="0 0 1000 80" preserveAspectRatio="none">
+            <!-- Normal rectangular outline -->
+            <polygon class="poly-normal" points="2,2 998,2 998,78 2,78" vector-effect="non-scaling-stroke"></polygon>
+            <!-- Hover slanted left edge: (2,78) up-right to (48,2) -->
+            <polygon class="poly-hover" points="48,2 998,2 998,78 2,78" vector-effect="non-scaling-stroke"></polygon>
+          </svg>
+          <span class="card-content">The chat</span>
+        </a>
+
+        <!-- Card 2: 'The ielts' -->
+        <a href="https://fliellie.github.io/Ielts/" target="_blank" rel="noopener noreferrer" class="card-link" onclick="playBeep()">
+          <svg class="card-svg-frame" viewBox="0 0 1000 80" preserveAspectRatio="none">
+            <polygon class="poly-normal" points="2,2 998,2 998,78 2,78" vector-effect="non-scaling-stroke"></polygon>
+            <polygon class="poly-hover" points="48,2 998,2 998,78 2,78" vector-effect="non-scaling-stroke"></polygon>
+          </svg>
+          <span class="card-content">The Ielts</span>
+        </a>
+
+        <!-- Card 3: fsdfnsjkfnskjfn -->
+        <a href="https://news.ycombinator.com" target="_blank" rel="noopener noreferrer" class="card-link" onclick="playBeep()">
+          <svg class="card-svg-frame" viewBox="0 0 1000 80" preserveAspectRatio="none">
+            <polygon class="poly-normal" points="2,2 998,2 998,78 2,78" vector-effect="non-scaling-stroke"></polygon>
+            <polygon class="poly-hover" points="48,2 998,2 998,78 2,78" vector-effect="non-scaling-stroke"></polygon>
+          </svg>
+          <span class="card-content">fsdfnsjkfnskjfn</span>
+        </a>
+
+        <!-- Card 4: fsdfnsjkfnskjfn -->
+        <a href="https://developer.mozilla.org" target="_blank" rel="noopener noreferrer" class="card-link" onclick="playBeep()">
+          <svg class="card-svg-frame" viewBox="0 0 1000 80" preserveAspectRatio="none">
+            <polygon class="poly-normal" points="2,2 998,2 998,78 2,78" vector-effect="non-scaling-stroke"></polygon>
+            <polygon class="poly-hover" points="48,2 998,2 998,78 2,78" vector-effect="non-scaling-stroke"></polygon>
+          </svg>
+          <span class="card-content">fsdfnsjkfnskjfn</span>
+        </a>
+
+        <!-- Card 5: fsdfnsjkfnskjfn -->
+        <a href="https://kernel.org" target="_blank" rel="noopener noreferrer" class="card-link" onclick="playBeep()">
+          <svg class="card-svg-frame" viewBox="0 0 1000 80" preserveAspectRatio="none">
+            <polygon class="poly-normal" points="2,2 998,2 998,78 2,78" vector-effect="non-scaling-stroke"></polygon>
+            <polygon class="poly-hover" points="48,2 998,2 998,78 2,78" vector-effect="non-scaling-stroke"></polygon>
+          </svg>
+          <span class="card-content">fsdfnsjkfnskjfn</span>
+        </a>
+
+        <!-- Card 6: fsdfnsjkfnskjfn -->
+        <a href="https://wikipedia.org" target="_blank" rel="noopener noreferrer" class="card-link" onclick="playBeep()">
+          <svg class="card-svg-frame" viewBox="0 0 1000 80" preserveAspectRatio="none">
+            <polygon class="poly-normal" points="2,2 998,2 998,78 2,78" vector-effect="non-scaling-stroke"></polygon>
+            <polygon class="poly-hover" points="48,2 998,2 998,78 2,78" vector-effect="non-scaling-stroke"></polygon>
+          </svg>
+          <span class="card-content">fsdfnsjkfnskjfn</span>
+        </a>
+
+      </div>
+
+      <!-- Scroll Indicator (Arrows as drawn in the user's sketch) -->
+      <div class="scroll-indicator">
+        <span class="scroll-arrow up">&uarr;</span>
+        <div class="scroll-line"></div>
+        <span class="scroll-arrow down">&darr;</span>
+      </div>
+    </div>
+
+    <div class="terminal-footer-hint">
+      [ HOVER TO SLANT &amp; ENLARGE // CLICK "THE CHAT" TO LAUNCH WEB APP ]
+    </div>
+
+  </div>
+
+  <script>
+    // Dual-engine audio synthesizer & base64 WAV player for retro game sound effects
+    const BLIP_SOUND_B64 = "data:audio/wav;base64,UklGRjIMAABXQVZFZm10IBAAAAABAAEAIlYAAESsAAACABAAZGF0YQ4MAAAAAPIPbR/7LS87pEYEUAZXdVssXR9cU1jkUQNJ8j0FMZ8iLhMrAxDzW+OF1ATHQrubsV2qwqXuo/OkyKhSr124osPJ0GjfDO83/2YPGR/OLRA7cUaTTyxWBVr8WghZOFSzTLZCkTapKHEZZgkP+fLomNmCyya/7bQwrS+oF6b8ptWqhbHTunDG+tP94vnyYwOvE08jujF0PgxJJVF2VtFYIFhmVMRNdETGOCEr/hvjC2H7Cetu2x7NmMBQtqOu1qkYqHip7K1NtVe/sMvo2X3p3/l3Cq0a6ymiN1FDjEz8UmJWn1auU6pNy0RjOd0ruRyHDN/7YOup207N3MDKtnqvM6sgqkyspLH1ue/EJ9Ie4UHx8gGPEnMiATGoPexHZU/IU+hUuVJQTeJEwTleLD0d+Awz/JXrydtvzRrBSLdesKWsQ6w9r3a1r76JyovYJOiz+IoJ/RleKQw3dkImS71QAVPYUU1NkEXxOuIt6x6tDtX9Fu0k3avOSMKBuMCxT65VrtKxorh7wvLOgN2H7VX+Mw9nHz4uEztYRZlMhVDwUNRNUkezPWEx5iLlEhECKvHs4BHSQ8USu/WzPbAWsIKzW7pUxPrQvN/w79sAuhHIIUowlzwfRnFMQk9xTgZKNEJWN+0plhoHCgT5VujG2AzLzr+Tt7+yi7EJtBm6dcOszyreQe4s/x0QSCDkLkA7xET4SpFNbkybR1Q//jMlJnQWsAWo9DDkGNUcyOC95raFs+qzEbjEv6XKKdil51X4YQn0GTcpZjbYQAZIkktNSzxHkD+uNCEnmhfjBtb1UOUs1i/JBr82uBm127Vxup/C+s3s27vrlPyXDeIdmCz1OFJCMEg/SmRItUKAOUEtnR5cDlz9guy33NPOlMOXu0m35rZ1usTBcczm2WnpI/orC5MbdioDN4pAhEacSLRG50CFNxQrQxzkC+D6Keqt2krNwMKnu2W4KbnpvWLGGdJl4HjwaAE/Egoi4C/3Oq5CkUZpRjZCNjreLtUg6hAIACvvTN9W0RzGRL5Euli6gL5/xtvR7N/d77wAjRFQIRUvDDqMQSRFnET8P4k3xitlHUQNXPyw60LcAc+6xA2+Y7vlvHzC0stU2EHnrfeWCPUYxychNEE9lULKQ8tAyDkwL6shEBJZAZLwxuD00vnHh8AWvd+91MKmy8bXcOa19o0H5ReyJgMzDDw6QTdC8z6jN78s+x46D4P+6O1+3kfRHseuwGG+X8CHxnLQed3B7En9+g25HX0rXDadPcRAnD83OvMwbCR6FRsFbPSH5IDWScukwxXA2cDkxd/OLdv46T/65QrIGtAoCTStOzU/Yz5FOTUw1CP9FLYEIvRk5JjWsst2xGTBtcJPyNDRjN6e7ff9bg7cHSkrYjXPO/s9vjtBNfoqpR02Dsj9iO2g3iTS+cjIw/LChsZBzpXZrueI9/gH0BflJTEx3zhgPHI7JzbhLFEgYxExAe/wz+Hy1EzLlMU4xFHHpc6m2YLnMPeABzsXMSVVMM83DzvVOTs0rSrkHdoOtf6t7v/fyNP4yjzG8cUdym3SPd6j7IT8ogzBG7ModzJLOLo5qDZTL00kdBbdBsT2aecE2qLPFMnhxjLJ289S2sPnHPckB5UWMyTmLtQ1cDiDNjUwCibSGJ4Jq/lA6p7c39HkyjzIH8pm0Izavefl9sUGEhaIIw0uxDQeN+s0WS70I5kWYweY94Xobdtm0UjLlMlvzJvTfd4s7ID7LQvkGWUmoi/SNIc1sTGjKQ4e7w96AALx2OIy1xHPJsvIy+fQEtp/5hv1oAS5ExUhjSs4MoI0NzKNKxghwxO5BE311+ad2rPR4MyRzM7QNNkF5TbzgQKNEQQfsSmhMDgzOTHUKpsgehOgBGL1IOci233S+c3+zYrSNNsw52n1kQRIEzYgLCpDMOsx/y7FJ+YcYw98AJLxA+QR2b7Ruc5H0ETWH+Dt7H37cApjGAgkRixaMOIv6SrpIbsVhwek+HvqYd5+1afQU9CI1N7ciuhu9jMFcxPPHxcpaS5BL40rqCNXGLIKC/zO7Vvh6Ndf0knRwNRt3I/nD/WYA8ERJR6MJwwtGS6cKuwizhdbCun75u234ZDYWtOY0l7WSd6O6Qv3ZgUwEwUftidjLJYsSijvH14UxQaE+A3rvd+719fTdNSB2Xric+4w/EkKTRflIfso1SsqKiYkaxr5DR0ARvLj5T3cVNbG1LnX3t516WH2RgSyETodqiUfKiMqtiVRHdkRhAS+9vrplN+l2OrVq9e43WnntPNIAbEOfxpuI4ooRymTJdQd4hLtBV34qOsv4RTaHNeX2Fzex+fQ8yYBVA7pGZ8ihCcQKDQkXxxuEZkES/f76gbhhdox2EnakeBT6nn2pwNkEEQbECPrJmYmkiH9GJ4NvgDS803ofd9g2onZDt2H5BnvkfuACHAUAh4iJBwmuSNAHXETbQeZ+mvuTORl3YLa9duS4bDqQfbqAjQPshkqIcAkCiQgH5YWbgv4/qjy8+cY4ATcMNyT4Knoe/O//wIM0BbiHkMjcCNlH6AXEA34AM30AOre4V/dCt3p4ILo6fLc/ugKmxWpHRsiZyKIHvcWoQzKAOX0YuqL4lLeO95G4vPpTfQOAMULABZ+HVMhCCGpHMIUTwqf/iPzSulK4gPf2t+z5O/sh/clA1UOsBcLHpsgDx+dGfUQMQau+uHvJueY4erfTuJ26JfxhfzbBycSGhqwHlYf+BsHFWoLXgBQ9avrreQ74cThNeb37Qn4GQO5DYcWYRyEHqscGBeGDhYEKPko72bn5eI64nnlM+yC9SkAwgrmE18aVh1nHLQX4Q/5BVD7UPFO6VvkHeO95d3rqvTz/lYJbxIEGTYclxtBF8wPOwbd+xjyP+ph5STks+av7Ef1Tf9gCSISYRhDG2ca7RV2DgkF9vqe8Urq/eVL5Uroju429wsBsgrTEk0YYBrFGLgT8AuGAsz4HfCy6W7mxOak6oLxYvoCBAcNLRRwGDsZchZ/EDsI1v6m9fjt5Ogh5+zoAO6h9bX+7Qf5D7EVRRhZFxMTEgxdAzb67/G663zoqeg37KHy8/r3A10M7RKyFiMXMhRRDmAGiv0a9U7uJOo16aLrDPGk+EcBsAmgEBEVXhZYFFAPCQia/0T3RvCp6xvq1OuP8JP30f8LCAUPtRNoFeATXA+OCH4AZ/iA8dTsFuuF7Ojwj/d1/2UHKg69Em4U/hKpDhwIWgCW+ADyme0N7JTt7/Fv+A8Aowf9DSQSdhPCEVAN0wZS//b35fEQ7g3tAe+Z8xv6fgGbCFMOwxFjEh8QVQvJBIj9tfZk8WvuP+7j8Oj1fvyYAxQK7A5bEQMR9A2xCBICK/sV9cnw9O7f72Dz4viA/yYGxAtyD5sQEw8eC2MF0/5/+G7zcfAC8C3ylfZ+/O4C2QhGDX8PKg9ZDIcHggFK++L1MPLL8OvxXPWI+pEAdwY/CyAOow63DLIIQwNU/eP31/Pb8UDy8vR3+Qv/vASWCcoM0Q2CDBsJMgSg/lT5NfXy8unyGfUd+UP+qANjCKYL5QzvC/MIdgRB/zj6Ofbv873zpvVR+Rr+KgOiB8AK+wshC10ILgRS/5765vbL9Kj0fvb2+XP+KANEBxEKFQslCnIHeAPv/qH6UPeP9an1lff2+jL/hQMtB4YJKQr+CD4GawI3/mD6lPdQ9sr25vhA/DoAHQQ5B/8IIwmkB8sEHwFM/QL61vcr9xn4cPrB/W0BywRAB1sI7wcUBiUDsP9V/LH5Pvg5+KD5LPxg/6UCYgUYB3oHfAZRBGQBQv5/+5z57viQ+WH7A/74ALIDsQWZBkQGxwRtAqz/B/38+un5//kz+0b90v9YAmIEkAWsBbgE5gKSADH+M/z3+rX6c/sK/Sb/XgFHA4cE4wRQBO8CCQH9/i/99vuK+/r7K/3e/rwAaQKUAwcEsgOqAigBef/x/dv8aPyp/I394v5hAMEBvgIqA/YCMQIIAbj/g/6k/UP9b/0X/hf/OABBAf8BUAIrApsBwgDR//b+W/4b/j7+tv5o/ykA1wBNAXoBWQH3AG0A2/9d/wv/8v4Q/1r/vP8eAG0AmwCiAIgAVwAfAO7/zv/C/8r/3f/y/w==";
+
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    // Continuously unlock on user interaction
+    ['click', 'pointerdown', 'mousedown', 'keydown', 'touchstart'].forEach(evt => {
+      window.addEventListener(evt, () => {
+        initAudio();
+      });
+    });
+
+    function playHoverBlip() {
+      initAudio();
+
+      if (audioCtx && audioCtx.state === 'running') {
+        try {
+          const now = audioCtx.currentTime;
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(650, now);
+          osc.frequency.exponentialRampToValueAtTime(1150, now + 0.05);
+
+          gain.gain.setValueAtTime(0.18, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.06);
+          return;
+        } catch(e) {}
+      }
+
+      // Fallback
+      try {
+        const snd = new Audio(BLIP_SOUND_B64);
+        snd.volume = 0.25;
+        snd.play().catch(() => {});
+      } catch(e) {}
+    }
+
+    function forceUnlockAndTest() {
+      initAudio();
+      playHoverBlip();
+      const badge = document.getElementById('audioStatusBadge');
+      if (badge) badge.textContent = '[ 🔊 SOUND: TEST OK ]';
+    }
+
+    const playBeep = playHoverBlip;
+
+    // Attach hover sound to all cards
+    document.querySelectorAll('.card-link').forEach(card => {
+      card.addEventListener('mouseenter', () => {
+        playHoverBlip();
+      });
+      card.addEventListener('click', () => {
+        playHoverBlip();
+      });
+    });
+  </script>
+</body>
+</html>
