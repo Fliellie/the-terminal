@@ -685,9 +685,11 @@ FILE: chat.html (Tổng: 1797 dòng code)
       font-weight: bold;
     }
 
-    .cue-text {
+.cue-text {
       color: #ffd600;
     }
+
+    
 
     .input-row {
       display: flex;
@@ -709,56 +711,66 @@ FILE: chat.html (Tổng: 1797 dòng code)
       transition: all 0.2s;
     }
 
+    /* Rounded Pill Input Box (tự động giãn chiều cao khi câu dài) */
+    .pill-input-box {
+      flex: 1;
+      min-height: 52px;
+      border: 1.5px solid #444;
+      border-radius: 26px;
+      background: #090a0c;
+      padding: 13px 20px;
+      display: flex;
+      align-items: center;
+      transition: all 0.2s;
+    }
+
     .pill-input-box:focus-within {
       border-color: var(--accent-green);
       box-shadow: 0 0 14px var(--accent-green-glow);
     }
 
-    .chat-text-input {
-      flex: 1;
-      background: transparent;
-      border: none;
-      outline: none;
-      color: #fff;
-      font-size: 1.05rem;
-      font-family: inherit;
-    }
-
-    .chat-text-input::placeholder {
-      color: #555;
-      font-size: 0.95rem;
-    }
-    /* Lớp phủ tô màu từng từ thời gian thực */
     .input-highlight-wrapper {
       position: relative;
       flex: 1;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      overflow: hidden;
+      width: 100%;
     }
 
     .input-backdrop {
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: 50%;
-      transform: translateY(-50%);
-      display: block; /* Dùng block thay vì flex để giữ nguyên khoảng trắng */
+      width: 100%;
       font-size: 1.05rem;
+      line-height: 1.45;
       font-family: inherit;
       letter-spacing: normal;
-      white-space: pre;
+      word-spacing: normal;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
       pointer-events: none;
-      overflow: hidden;
     }
 
     .chat-text-input.live-colored {
-      position: relative;
+      position: absolute;
+      inset: 0;
       z-index: 2;
       width: 100%;
-      color: transparent; /* Ẩn màu chữ gốc để lộ màu xanh/đỏ bên dưới */
-      caret-color: #fff;  /* Giữ con trỏ nhấp nháy màu trắng */
+      height: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      resize: none;
+      overflow: hidden;
+      padding: 0;
+      margin: 0;
+      font-size: 1.05rem;
+      line-height: 1.45;
+      font-family: inherit;
+      letter-spacing: normal;
+      word-spacing: normal;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      color: transparent;
+      caret-color: #fff;
     }
 
     .chat-text-input.live-colored::selection {
@@ -770,26 +782,13 @@ FILE: chat.html (Tổng: 1797 dòng code)
       font-weight: 500;
     }
 
-    .word-err {
+.word-err {
       color: var(--danger);
       text-decoration: underline wavy rgba(255, 77, 79, 0.6);
     }
 
-    .btn-hint-inline {
-      background: rgba(255, 255, 255, 0.08);
-      border: none;
-      color: var(--text-muted);
-      font-size: 0.75rem;
-      padding: 4px 10px;
-      border-radius: 999px;
-      cursor: pointer;
-      transition: all 0.2s;
-      white-space: nowrap;
-    }
-
-    .btn-hint-inline:hover {
-      background: rgba(0, 230, 118, 0.2);
-      color: var(--accent-green);
+    .word-ghost {
+      color: rgba(255, 255, 255, 0.22);
     }
 
     /* Send Button with Paper Airplane Icon (as sketched) */
@@ -989,6 +988,93 @@ FILE: chat.html (Tổng: 1797 dòng code)
       flex-wrap: wrap;
       justify-content: center;
     }
+    /* Sổ tay câu ghép & từ lóng */
+    .notebook-section {
+      background: rgba(96, 165, 250, 0.06);
+      border: 1px solid rgba(96, 165, 250, 0.35);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 8px;
+    }
+
+    .notebook-header {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #60a5fa;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .notebook-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .notebook-item {
+      background: rgba(0, 0, 0, 0.35);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.88rem;
+      line-height: 1.45;
+    }
+
+    .nb-phrase {
+      color: var(--accent-green);
+      font-weight: 700;
+    }
+
+    .nb-type {
+      font-size: 0.72rem;
+      background: rgba(255, 214, 0, 0.15);
+      color: #ffd600;
+      padding: 1px 6px;
+      border-radius: 4px;
+      margin-left: 6px;
+    }
+
+    .nb-meaning {
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Nhãn chế độ trên thanh header chat */
+    .mode-badge {
+      font-size: 0.75rem;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-weight: 700;
+      background: rgba(0, 230, 118, 0.12);
+      color: var(--accent-green);
+      border: 1px solid rgba(0, 230, 118, 0.35);
+    }
+
+    .mode-badge.free {
+      background: rgba(96, 165, 250, 0.15);
+      color: #60a5fa;
+      border-color: rgba(96, 165, 250, 0.45);
+    }
+
+    /* Khung xem trước & copy hội thoại Free Chat */
+    .free-review-box {
+      width: 100%;
+      max-width: 620px;
+      max-height: 220px;
+      overflow-y: auto;
+      background: #0d1015;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      text-align: left;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+      margin-bottom: 20px;
+      white-space: pre-wrap;
+      user-select: text;
+    }
   </style>
 </head>
 <body>
@@ -1094,15 +1180,17 @@ FILE: chat.html (Tổng: 1797 dòng code)
     <div class="screen-chat" id="screenChat">
       
       <!-- Top chat bar -->
+<!-- Top chat bar -->
       <div class="chat-header-bar">
         <div class="chat-header-title">
           <button class="btn-back-pill" onclick="goToLibrary()" style="margin-right: 8px;">&larr;</button>
           <span id="chatHeaderTitle">Hotel Check-in</span>
+          <span class="mode-badge" id="chatModeBadge">NORMAL</span>
         </div>
         <div class="chat-header-actions">
           <button class="btn-recheck" onclick="openScriptModal()">
-            <span>📜</span>
-            <span>Recheck</span>
+            <span>📓</span>
+            <span>Notebook &amp; Script</span>
           </button>
         </div>
       </div>
@@ -1115,29 +1203,32 @@ FILE: chat.html (Tổng: 1797 dòng code)
       <!-- Bottom Input area as sketched in Image 3 -->
       <div class="chat-bottom-area">
         <!-- Native language cue -->
-        <div class="native-cue-banner" id="nativeCueBanner">
-          <span class="cue-star">*</span>
-          <span class="cue-text" id="cueText">"ồ tôi ổn, mà bạn đang đi đâu thế?"</span>
+        <div class="native-cue-banner" id="nativeCueBanner" style="justify-content: space-between;">
+          <div>
+            <span class="cue-star">*</span>
+            <span class="cue-text" id="cueText">"ồ tôi ổn, mà bạn đang đi đâu thế?"</span>
+          </div>
+          <span id="tabPeekStatus" style="font-size: 0.78rem; color: var(--text-muted); font-style: normal;">[Tab: Peek 2s]</span>
         </div>
 
         <div class="input-row">
           <!-- User Avatar Circle -->
-          <div class="avatar-circle user-avatar">you</div>
+          <div class="avatar-circle user-avatar" id="activeSpeakerBadge">you</div>
 
          <!-- Rounded Pill Input Box -->
+          
           <div class="pill-input-box">
             <div class="input-highlight-wrapper">
               <div id="inputBackdrop" class="input-backdrop"></div>
-              <input 
-                type="text" 
+              <textarea 
                 id="chatInput" 
                 class="chat-text-input live-colored" 
-                placeholder="Type your response in English..." 
+                rows="1"
+                placeholder="" 
                 autocomplete="off" 
                 spellcheck="false"
-              />
+              ></textarea>
             </div>
-            <button type="button" class="btn-hint-inline" onclick="handleHintClick()">Hint (Tab)</button>
           </div>
 
           <!-- Send Paper Airplane Button -->
@@ -1151,13 +1242,13 @@ FILE: chat.html (Tổng: 1797 dòng code)
       </div>
 
       <!-- Completion Overlay Card -->
+<!-- Completion Overlay Card -->
       <div class="finish-card-overlay" id="finishOverlay">
-        <h3 class="finish-title">🎉 Great Job!</h3>
-        <p class="finish-desc">You completed this conversation successfully.</p>
-        <div class="finish-actions">
-          <button class="btn-lib-action start" onclick="replayCurrentChat()">Practice Again</button>
-          <button class="btn-lib-action" onclick="deleteCurrentChat()">Delete from DB</button>
-          <button class="btn-lib-action import" onclick="goToLibrary()">Library</button>
+        <h3 class="finish-title" id="finishTitle">🎉 Great Job!</h3>
+        <p class="finish-desc" id="finishDesc">You completed this conversation successfully.</p>
+        <div class="free-review-box" id="freeReviewBox" style="display: none;"></div>
+        <div class="finish-actions" id="finishActions">
+          <!-- Nút hành động sẽ tự thay đổi theo chế độ Normal Chat hoặc Free Chat -->
         </div>
       </div>
 
@@ -1166,19 +1257,20 @@ FILE: chat.html (Tổng: 1797 dòng code)
   </div>
 
   <!-- ==========================================================================
-       MODAL 1: SCRIPT PREVIEW / RECHECK (Before starting or on recheck)
+       MODAL 1: SCRIPT PREVIEW / NOTEBOOK / MODE SELECTOR
        ========================================================================== -->
   <div class="modal-overlay" id="scriptModal">
     <div class="modal-card">
       <div class="modal-header">
-        <span class="modal-title" id="scriptModalTitle">Conversation Script</span>
+        <span class="modal-title" id="scriptModalTitle">Conversation Script &amp; Notebook</span>
         <button class="btn-back-pill" onclick="closeScriptModal()">✕</button>
       </div>
       <div class="modal-body" id="scriptModalBody">
-        <!-- Injected list of turns -->
+        <!-- Injected notebook + list of turns -->
       </div>
       <div class="modal-footer">
-        <button class="btn-modal-ok" onclick="confirmStartChatFromScript()">Start Chat (OK)</button>
+        <button class="btn-modal-ok" onclick="confirmStartChatFromScript(false)">Start Normal Chat</button>
+        <button class="btn-modal-ok" style="background: #3b82f6; color: #fff;" onclick="confirmStartChatFromScript(true)">🚀 Start Free Chat</button>
       </div>
     </div>
   </div>
@@ -1224,7 +1316,9 @@ FILE: chat.html (Tổng: 1797 dòng code)
         <div style="position: relative; background: rgba(255,255,255,0.04); padding: 12px 14px; border-radius: 6px; font-size: 0.85rem; color: var(--accent-green); border: 1px dashed var(--card-border); user-select: text; -webkit-user-select: text; line-height: 1.5;">
           <button type="button" onclick="const t=document.getElementById('samplePromptText').innerText.replace(/\s+/g, ' ').trim(); navigator.clipboard.writeText(t); if(typeof playSuccessChime==='function') playSuccessChime(); this.textContent='Copied!'; this.style.background='var(--accent-green)'; this.style.color='#000'; setTimeout(()=>{this.textContent='Copy'; this.style.background='rgba(0, 230, 118, 0.15)'; this.style.color='var(--accent-green)';}, 1500);" style="position: absolute; top: 8px; right: 8px; background: rgba(0, 230, 118, 0.15); border: 1px solid var(--accent-green); color: var(--accent-green); border-radius: 4px; padding: 3px 8px; font-size: 0.75rem; cursor: pointer; font-weight: 600;">Copy</button>
           <div id="samplePromptText" style="padding-right: 55px;">
-            Generate a natural, realistic <span id="dynLength" style="color: #ffd600; font-weight: bold;">8</span>-turn language learning conversation between 2 characters (Bob and Laura) in English (CEFR level <span id="dynLevel" style="color: #ffd600; font-weight: bold;">B1</span>) about "<span id="dynTopic" style="color: #ffd600; font-weight: bold;">daily life</span>". Return ONLY a valid raw JSON array (no markdown formatting, no code blocks, no extra explanation) using this exact schema: [{"speaker": "Name", "text_target": "Natural target language sentence", "text_native": "Natural Vietnamese translation", "is_player": false}]. Alternate turns between the NPC (is_player: false) and the learner (is_player: true).
+            Create a natural <span id="dynLength" style="color: #ffd600; font-weight: bold;">8</span>-turn English conversation (CEFR <span id="dynLevel" style="color: #ffd600; font-weight: bold;">B1</span>) between Bob and Laura about "<span id="dynTopic" style="color: #ffd600; font-weight: bold;">daily life</span>". Return ONLY raw valid JSON (no markdown, no intro/outro text) with this exact schema:
+            {"notebook": [{"phrase": "useful slang, idiom, or compound structure from the dialogue", "type": "Slang / Idiom / Compound Sentence", "meaning": "Giải thích ngắn bằng tiếng Việt"}], "turns": [{"speaker": "Bob", "text_target": "English sentence", "text_native": "Dịch tiếng Việt tự nhiên", "idea_prompt": "Gợi ý ý tưởng trả lời bằng tiếng Việt cho chế độ Free Chat", "is_player": false}]}
+            Rules: Alternate turns between Bob (is_player: false) and Laura (is_player: true). Include 3-5 items in "notebook".
           </div>
         </div>
 
@@ -1367,7 +1461,7 @@ FILE: chat.html (Tổng: 1797 dòng code)
        ========================================================================== */
     const DB_KEY = 'THE_TERMINAL_CHAT_DB';
 
-    const INITIAL_CHATS = [
+const INITIAL_CHATS = [
       {
         id: 1,
         title: "Hotel Check-in",
@@ -1375,6 +1469,18 @@ FILE: chat.html (Tổng: 1797 dòng code)
         user_lang: "vietnamese",
         rank: "B2",
         about: "travel",
+        notebook: [
+          {
+            phrase: "under the name of + [Name]",
+            type: "Collocation",
+            meaning: "Đặt phòng / đăng ký dưới tên của ai đó."
+          },
+          {
+            phrase: "Could you tell me + [Wh-word] + S + V?",
+            type: "Compound Sentence",
+            meaning: "Câu hỏi gián tiếp lịch sự (lưu ý không đảo trợ động từ sau what time)."
+          }
+        ],
         turns: [
           {
             speaker: "Receptionist",
@@ -1386,6 +1492,7 @@ FILE: chat.html (Tổng: 1797 dòng code)
             speaker: "Emma",
             text_target: "Yes, I booked a deluxe room under the name of Emma Watson.",
             text_native: "Vâng, tôi đã đặt một phòng deluxe dưới tên Emma Watson.",
+            idea_prompt: "Xác nhận bạn đã đặt phòng trước và nêu tên hoặc loại phòng bạn đặt.",
             is_player: true
           },
           {
@@ -1398,40 +1505,7 @@ FILE: chat.html (Tổng: 1797 dòng code)
             speaker: "Emma",
             text_target: "Could you tell me what time breakfast is served tomorrow?",
             text_native: "Bạn có thể cho tôi biết bữa sáng ngày mai phục vụ vào lúc mấy giờ không?",
-            is_player: true
-          }
-        ]
-      },
-      {
-        id: 2,
-        title: "Food & Restaurant",
-        target_lang: "english",
-        user_lang: "vietnamese",
-        rank: "A2",
-        about: "food",
-        turns: [
-          {
-            speaker: "Waiter",
-            text_target: "Hello! Are you ready to order your dinner?",
-            text_native: "Xin chào! Bạn đã sẵn sàng gọi món cho bữa tối chưa?",
-            is_player: false
-          },
-          {
-            speaker: "Alex",
-            text_target: "Yes, I would like the grilled salmon with asparagus, please.",
-            text_native: "Vâng, cho tôi món cá hồi nướng măng tây nhé.",
-            is_player: true
-          },
-          {
-            speaker: "Waiter",
-            text_target: "Excellent choice. Would you like anything to drink?",
-            text_native: "Lựa chọn tuyệt vời. Bạn có muốn dùng đồ uống gì không?",
-            is_player: false
-          },
-          {
-            speaker: "Alex",
-            text_target: "Just sparkling water with a slice of lemon for me.",
-            text_native: "Cho tôi một ly nước khoáng có ga kèm lát chanh là được.",
+            idea_prompt: "Hỏi lễ tân thêm một thông tin tiện ích của khách sạn (giờ ăn sáng, wifi, hoặc thang máy).",
             is_player: true
           }
         ]
@@ -1443,6 +1517,23 @@ FILE: chat.html (Tổng: 1797 dòng code)
         user_lang: "vietnamese",
         rank: "B1",
         about: "work",
+        notebook: [
+          {
+            phrase: "heading to + [place]",
+            type: "Slang / Casual",
+            meaning: "Đang đi tới đâu đó (tự nhiên và thông dụng hơn 'going to' trong giao tiếp)."
+          },
+          {
+            phrase: "catch up later",
+            type: "Phrasal Verb / Slang",
+            meaning: "Gặp lại / trò chuyện cập nhật tình hình với nhau sau nhé."
+          },
+          {
+            phrase: "Oh, I am just fine, where are you heading to?",
+            type: "Compound Sentence",
+            meaning: "Cách nối 2 vế trả lời xã giao và hỏi ngược lại đối phương một cách tự nhiên."
+          }
+        ],
         turns: [
           {
             speaker: "Bob",
@@ -1454,6 +1545,7 @@ FILE: chat.html (Tổng: 1797 dòng code)
             speaker: "Laura",
             text_target: "Oh, I am just fine, where are you heading to?",
             text_native: "Ồ tôi ổn, mà bạn đang đi đâu thế?",
+            idea_prompt: "Trả lời rằng bạn vẫn ổn và hỏi xem Bob đang vội đi đâu.",
             is_player: true
           },
           {
@@ -1466,6 +1558,7 @@ FILE: chat.html (Tổng: 1797 dòng code)
             speaker: "Laura",
             text_target: "Good luck with your presentation, let us catch up later.",
             text_native: "Chúc bài thuyết trình may mắn nhé, lát gặp lại sau.",
+            idea_prompt: "Chúc Bob họp/thuyết trình suôn sẻ và hẹn gặp lại sau.",
             is_player: true
           }
         ]
@@ -1607,13 +1700,38 @@ FILE: chat.html (Tổng: 1797 dòng code)
     const chatInput = document.getElementById('chatInput');
     const finishOverlay = document.getElementById('finishOverlay');
 
+let isFreeChatMode = false;
+    let freeChatHistory = [];
+
     function openScriptModalForChat(chat) {
       activeChat = chat;
-      document.getElementById('scriptModalTitle').textContent = `Script: ${chat.title} (${(chat.target_lang || 'English').toUpperCase()})`;
+      document.getElementById('scriptModalTitle').textContent = `${chat.title} (${(chat.target_lang || 'English').toUpperCase()})`;
       
       const modalBody = document.getElementById('scriptModalBody');
       modalBody.innerHTML = '';
 
+      // 1. Hiển thị Sổ tay Câu ghép & Từ lóng nếu có
+      if (Array.isArray(chat.notebook) && chat.notebook.length > 0) {
+        const nbBox = document.createElement('div');
+        nbBox.className = 'notebook-section';
+        nbBox.innerHTML = `
+          <div class="notebook-header">📓 Sổ tay Câu ghép &amp; Từ lóng nên ghi lại</div>
+          <div class="notebook-list">
+            ${chat.notebook.map(item => `
+              <div class="notebook-item">
+                <div>
+                  <span class="nb-phrase">${escapeHTML(item.phrase)}</span>
+                  <span class="nb-type">${escapeHTML(item.type || 'Phrase')}</span>
+                </div>
+                <div class="nb-meaning">${escapeHTML(item.meaning)}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+        modalBody.appendChild(nbBox);
+      }
+
+      // 2. Hiển thị kịch bản hội thoại
       chat.turns.forEach(turn => {
         const item = document.createElement('div');
         item.className = `script-turn-item ${turn.is_player ? 'is-user' : ''}`;
@@ -1621,6 +1739,7 @@ FILE: chat.html (Tổng: 1797 dòng code)
           <div class="script-speaker">${escapeHTML(turn.speaker)} ${turn.is_player ? '(YOU)' : ''}</div>
           <div class="script-target">${escapeHTML(turn.text_target)}</div>
           <div class="script-native">"${escapeHTML(turn.text_native)}"</div>
+          ${turn.is_player && turn.idea_prompt ? `<div style="font-size: 0.8rem; color: #60a5fa; margin-top: 2px;">💡 Ý tưởng Free Chat: ${escapeHTML(turn.idea_prompt)}</div>` : ''}
         `;
         modalBody.appendChild(item);
       });
@@ -1638,23 +1757,88 @@ FILE: chat.html (Tổng: 1797 dòng code)
       document.getElementById('scriptModal').style.display = 'none';
     }
 
-    // When user clicks "Start Chat (OK)" in script preview modal:
-    // It clears the script so user is not distracted and starts the messenger practice!
-    function confirmStartChatFromScript() {
+    function confirmStartChatFromScript(freeMode = false) {
       playSuccessChime();
       closeScriptModal();
 
-      // Show Chat View (Screen 3)
+      isFreeChatMode = freeMode;
+      freeChatHistory = [];
+
       screenHome.style.display = 'none';
       screenLibrary.style.display = 'none';
       screenChat.style.display = 'flex';
       finishOverlay.style.display = 'none';
 
       chatHeaderTitle.textContent = activeChat.title;
+      const modeBadge = document.getElementById('chatModeBadge');
+      if (modeBadge) {
+        modeBadge.textContent = isFreeChatMode ? 'FREE CHAT' : 'NORMAL';
+        modeBadge.className = isFreeChatMode ? 'mode-badge free' : 'mode-badge';
+      }
+
       chatMessagesArea.innerHTML = '';
       activeTurnIndex = 0;
 
       proceedNextTurnInMessenger();
+    }
+
+    let isPeekingHint = false;
+    let lastTabPeekTime = 0;
+    let peekHideTimeout = null;
+    let peekCooldownInterval = null;
+    const inputBackdrop = document.getElementById('inputBackdrop');
+
+    function resetTabPeekState() {
+      isPeekingHint = false;
+      lastTabPeekTime = 0;
+      if (peekHideTimeout) clearTimeout(peekHideTimeout);
+      if (peekCooldownInterval) clearInterval(peekCooldownInterval);
+      const statusEl = document.getElementById('tabPeekStatus');
+      if (statusEl) {
+        if (isFreeChatMode) {
+          statusEl.textContent = '[Free Reply: Gõ tự do]';
+          statusEl.style.color = '#60a5fa';
+        } else {
+          statusEl.textContent = '[Tab: Peek 2s]';
+          statusEl.style.color = 'var(--text-muted)';
+        }
+      }
+    }
+
+    function triggerTabPeek() {
+      if (isFreeChatMode) return; // Free Chat không dùng Tab peek đáp án mẫu
+      if (!activeChat || activeTurnIndex >= activeChat.turns.length) return;
+
+      const now = Date.now();
+      const elapsed = now - lastTabPeekTime;
+      if (elapsed < 3000) return;
+
+      playHoverBlip();
+      lastTabPeekTime = now;
+      isPeekingHint = true;
+      updateLiveInputHighlight();
+
+      if (peekHideTimeout) clearTimeout(peekHideTimeout);
+      peekHideTimeout = setTimeout(() => {
+        isPeekingHint = false;
+        updateLiveInputHighlight();
+      }, 2000);
+
+      const statusEl = document.getElementById('tabPeekStatus');
+      if (peekCooldownInterval) clearInterval(peekCooldownInterval);
+      peekCooldownInterval = setInterval(() => {
+        const left = Math.ceil((3000 - (Date.now() - lastTabPeekTime)) / 1000);
+        if (left <= 0) {
+          clearInterval(peekCooldownInterval);
+          if (statusEl) {
+            statusEl.textContent = '[Tab: Peek 2s]';
+            statusEl.style.color = 'var(--text-muted)';
+          }
+        } else if (statusEl) {
+          statusEl.textContent = `[Tab: ${left}s...]`;
+          statusEl.style.color = '#ff7875';
+        }
+      }, 200);
     }
 
     function proceedNextTurnInMessenger() {
@@ -1663,23 +1847,64 @@ FILE: chat.html (Tổng: 1797 dòng code)
         return;
       }
 
+      resetTabPeekState();
       const turn = activeChat.turns[activeTurnIndex];
+      const badge = document.getElementById('activeSpeakerBadge');
 
-      if (!turn.is_player) {
-        // NPC Turn
-        setTimeout(() => {
-          renderNPCMessageBubble(turn.speaker, turn.text_target);
-          activeTurnIndex++;
-          proceedNextTurnInMessenger();
-        }, 350);
-      } else {
-        // Player Turn: Show Native Cue above the input bar as drawn in Image 3
-        nativeCueBanner.style.display = 'flex';
-        cueText.textContent = `"${turn.text_native}"`;
-        chatInput.value = '';
-        chatInput.focus();
-        scrollToChatBottom();
+      // CHẾ ĐỘ FREE CHAT: Máy tự nói vế NPC, người dùng tự nghĩ câu trả lời theo ý tưởng
+      if (isFreeChatMode) {
+        if (!turn.is_player) {
+          chatInput.value = '';
+          updateLiveInputHighlight();
+          setTimeout(() => {
+            renderNPCMessageBubble(turn.speaker, turn.text_target);
+            freeChatHistory.push({
+              speaker: turn.speaker,
+              is_player: false,
+              text: turn.text_target
+            });
+            activeTurnIndex++;
+            proceedNextTurnInMessenger();
+          }, 400);
+        } else {
+          nativeCueBanner.style.display = 'flex';
+          const idea = turn.idea_prompt || turn.text_native;
+          cueText.textContent = `💡 Ý tưởng (${turn.speaker}): ${idea}`;
+          if (badge) {
+            badge.textContent = 'you';
+            badge.style.borderColor = '#60a5fa';
+            badge.style.color = '#60a5fa';
+          }
+          chatInput.value = '';
+          updateLiveInputHighlight();
+          chatInput.focus();
+          scrollToChatBottom();
+        }
+        return;
       }
+
+      // CHẾ ĐỘ NORMAL CHAT: Người dùng gõ cả 2 vế
+      nativeCueBanner.style.display = 'flex';
+      if (turn.is_player) {
+        cueText.textContent = `${turn.speaker} (you): "${turn.text_native}"`;
+        if (badge) {
+          badge.textContent = 'you';
+          badge.style.borderColor = 'var(--accent-green)';
+          badge.style.color = 'var(--accent-green)';
+        }
+      } else {
+        cueText.textContent = `${turn.speaker} is speaking... (Press Tab to peek)`;
+        if (badge) {
+          badge.textContent = turn.speaker.slice(0, 3);
+          badge.style.borderColor = '#60a5fa';
+          badge.style.color = '#60a5fa';
+        }
+      }
+
+      chatInput.value = '';
+      updateLiveInputHighlight();
+      chatInput.focus();
+      scrollToChatBottom();
     }
 
     function renderNPCMessageBubble(speaker, text) {
@@ -1714,7 +1939,6 @@ FILE: chat.html (Tổng: 1797 dòng code)
       });
     }
 
-    // Normalizing text: ignores punctuation ' . , ? ! " : ; and case
     function normalizePhrase(str) {
       return (str || '')
         .toLowerCase()
@@ -1723,37 +1947,53 @@ FILE: chat.html (Tổng: 1797 dòng code)
         .trim();
     }
 
-    // User sends response
-// User sends response
     function handleUserSend() {
       const userInput = chatInput.value.trim();
       if (!userInput) return;
 
       const turn = activeChat.turns[activeTurnIndex];
+
+      // 1. XỬ LÝ KHI ĐANG Ở CHẾ ĐỘ FREE CHAT (Chấp nhận mọi câu tự diễn đạt)
+      if (isFreeChatMode) {
+        playSuccessChime();
+        renderUserMessageBubble(userInput);
+        freeChatHistory.push({
+          speaker: turn.speaker,
+          is_player: true,
+          text: userInput,
+          intended_idea: turn.idea_prompt || turn.text_native,
+          sample_answer: turn.text_target
+        });
+
+        chatInput.value = '';
+        updateLiveInputHighlight();
+        activeTurnIndex++;
+        proceedNextTurnInMessenger();
+        return;
+      }
+
+      // 2. XỬ LÝ KHI ĐANG Ở CHẾ ĐỘ NORMAL CHAT
       const normalizedUser = normalizePhrase(userInput);
       const normalizedExpected = normalizePhrase(turn.text_target);
 
-      // Rule: missing punctuation ' . , ? ! is NOT counted as an error
       if (normalizedUser === normalizedExpected) {
-        // CORRECT ANSWER -> "tinh tinh" sound chime!
         playSuccessChime();
-        renderUserMessageBubble(turn.text_target); // Render formatted response
+        if (turn.is_player) {
+          renderUserMessageBubble(turn.text_target);
+        } else {
+          renderNPCMessageBubble(turn.speaker, turn.text_target);
+        }
+
         chatInput.value = '';
         updateLiveInputHighlight();
-
-        // Clear any previous error box
         clearErrorFeedback();
 
         activeTurnIndex++;
         proceedNextTurnInMessenger();
       } else {
-        // INCORRECT ANSWER -> "tè tè" buzz sound!
         playErrorBuzzer();
-
-        // Render error diff box with red wavy underline
         showErrorFeedback(userInput, turn.text_target);
 
-        // Giữ lại phần các từ đầu đã gõ đúng, xóa phần sai trở về sau để gõ tiếp
         const userWords = userInput.split(/\s+/);
         const expectedWords = turn.text_target.split(/\s+/);
         let correctPrefix = [];
@@ -1762,16 +2002,17 @@ FILE: chat.html (Tổng: 1797 dòng code)
           if (i < expectedWords.length && normalizePhrase(userWords[i]) === normalizePhrase(expectedWords[i])) {
             correctPrefix.push(expectedWords[i]);
           } else {
-            break; // Dừng lại ngay tại từ đầu tiên bị sai
+            break;
           }
         }
 
         chatInput.value = correctPrefix.length > 0 ? correctPrefix.join(' ') + ' ' : '';
+        updateLiveInputHighlight();
         chatInput.focus();
       }
     }
 
-let errorTimeoutId = null;
+    let errorTimeoutId = null;
 
     function showErrorFeedback(userInput, expectedText) {
       clearErrorFeedback();
@@ -1795,12 +2036,11 @@ let errorTimeoutId = null;
       errBox.innerHTML = `
         <div><b>Incorrect phrase:</b> ${diffHTML}</div>
         <div class="correct-phrase-box">Correct sentence: "${escapeHTML(expectedText)}"</div>
-        <div style="font-size: 0.8rem; color: #ff7875; margin-top: 4px;">Please re-enter your response accurately. (Hiding in 5s...)</div>
+        <div style="font-size: 0.8rem; color: #ff7875; margin-top: 4px;">Please re-enter your response accurately. (Hiding in 3s...)</div>
       `;
       chatMessagesArea.appendChild(errBox);
       scrollToChatBottom();
 
-      // Tự động ẩn gợi ý sau 5 giây
       errorTimeoutId = setTimeout(() => {
         clearErrorFeedback();
       }, 3000);
@@ -1815,111 +2055,143 @@ let errorTimeoutId = null;
       if (oldBox) oldBox.remove();
     }
 
-    function clearErrorFeedback() {
-      const oldBox = document.getElementById('activeErrorBox');
-      if (oldBox) oldBox.remove();
+    function stripPunctuationKeepSpaces(str) {
+      return (str || '')
+        .replace(/['".,?!:;“”‘’\r\n]/g, '')
+        .replace(/\s+/g, ' ')
+        .trimStart();
     }
-
-    // Tab key / Hint button: auto-fill next correct word
-    function handleHintClick() {
-      if (!activeChat) return;
-      const turn = activeChat.turns[activeTurnIndex];
-      if (!turn || !turn.is_player) return;
-
-      playHoverBlip();
-      const expectedWords = turn.text_target.split(/\s+/);
-      const currentWords = chatInput.value.trim().split(/\s+/).filter(Boolean);
-
-      let nextIndex = 0;
-      for (let i = 0; i < currentWords.length; i++) {
-        if (normalizePhrase(currentWords[i]) === normalizePhrase(expectedWords[i])) {
-          nextIndex = i + 1;
-        } else {
-          break;
-        }
-      }
-
-      if (nextIndex < expectedWords.length) {
-        const hintedWords = expectedWords.slice(0, nextIndex + 1).join(' ');
-        chatInput.value = hintedWords + ' ';
-      } else {
-        chatInput.value = turn.text_target;
-      }
-      chatInput.focus();
-    }
-const inputBackdrop = document.getElementById('inputBackdrop');
 
     function updateLiveInputHighlight() {
       if (!inputBackdrop) return;
-      const val = chatInput.value;
 
-      // Ẩn placeholder khi đang có chữ để không bị đè chữ
-      chatInput.placeholder = val.length > 0 ? '' : 'Type your response in English...';
-
-      if (!val || !activeChat) {
-        inputBackdrop.innerHTML = '';
+      if (!activeChat || activeTurnIndex >= activeChat.turns.length) {
+        inputBackdrop.innerHTML = '&nbsp;';
         return;
       }
 
+      // Ở chế độ Free Chat: Giữ nguyên dấu câu và hiển thị chữ bình thường
+      if (isFreeChatMode) {
+        const rawVal = chatInput.value.replace(/[\r\n]/g, '');
+        if (chatInput.value !== rawVal) chatInput.value = rawVal;
+        chatInput.placeholder = rawVal.length > 0 ? '' : 'Tự do viết câu trả lời tiếng Anh của bạn...';
+        inputBackdrop.innerHTML = escapeHTML(rawVal) || '&nbsp;';
+        return;
+      }
+
+      // Ở chế độ Normal Chat: Lọc dấu câu và tô màu từng ký tự
+      chatInput.placeholder = '';
       const turn = activeChat.turns[activeTurnIndex];
-      if (!turn || !turn.is_player) {
-        inputBackdrop.innerHTML = escapeHTML(val).replace(/ /g, '&nbsp;');
-        return;
+      const cleanVal = stripPunctuationKeepSpaces(chatInput.value);
+      if (chatInput.value !== cleanVal) {
+        chatInput.value = cleanVal;
       }
 
-      const expectedWords = turn.text_target.split(/\s+/);
-      const tokens = val.split(/(\s+)/);
-      let wordIdx = 0;
+      const target = stripPunctuationKeepSpaces(turn.text_target).trim();
+      let html = '';
 
-      const html = tokens.map(token => {
-        if (/^\s+$/.test(token)) {
-          // Chuyển dấu cách thành &nbsp; để trình duyệt luôn giữ đúng độ rộng khoảng trắng
-          return token.replace(/ /g, '&nbsp;');
+      for (let i = 0; i < cleanVal.length; i++) {
+        const typedChar = cleanVal[i];
+        const targetChar = target[i];
+        const displayChar = escapeHTML(typedChar);
+
+        if (targetChar !== undefined && typedChar.toLowerCase() === targetChar.toLowerCase()) {
+          html += `<span class="word-ok">${displayChar}</span>`;
+        } else {
+          html += `<span class="word-err">${displayChar}</span>`;
         }
-        const normTyped = normalizePhrase(token);
-        const normExp = normalizePhrase(expectedWords[wordIdx] || '');
-        const isLastToken = (val.trimEnd() === val) && (wordIdx === val.trim().split(/\s+/).length - 1);
+      }
 
-        let isMatch = false;
-        if (normTyped === normExp && normExp !== '') {
-          isMatch = true;
-        } else if (isLastToken && normExp.startsWith(normTyped) && normTyped !== '') {
-          isMatch = true;
-        }
+      if (isPeekingHint && cleanVal.length < target.length) {
+        const remaining = escapeHTML(target.slice(cleanVal.length));
+        html += `<span class="word-ghost">${remaining}</span>`;
+      }
 
-        wordIdx++;
-        return `<span class="${isMatch ? 'word-ok' : 'word-err'}">${escapeHTML(token)}</span>`;
-      }).join('');
-
-      inputBackdrop.innerHTML = html;
-      inputBackdrop.scrollLeft = chatInput.scrollLeft;
+      inputBackdrop.innerHTML = html || '&nbsp;';
     }
 
     chatInput.addEventListener('input', updateLiveInputHighlight);
-    chatInput.addEventListener('scroll', () => {
-      if (inputBackdrop) inputBackdrop.scrollLeft = chatInput.scrollLeft;
-    });
-    // Keyboard Listeners in Chat Input
+
     chatInput.addEventListener('keydown', (e) => {
       if (e.key === 'Tab') {
         e.preventDefault();
-        handleHintClick();
+        triggerTabPeek();
       } else if (e.key === 'Enter') {
         e.preventDefault();
         handleUserSend();
       }
     });
 
-    // Finish session
+    // Tạo nội dung Prompt + Hội thoại Free Chat để nộp AI chấm
+    function buildFreeChatGradingPrompt() {
+      const lines = freeChatHistory.map((item, index) => {
+        if (!item.is_player) {
+          return `${index + 1}. ${item.speaker} (Partner): "${item.text}"`;
+        } else {
+          return `${index + 1}. ${item.speaker} (Learner - My Reply): "${item.text}"\n   [Ý tưởng mục tiêu]: ${item.intended_idea}\n   [Câu mẫu tham khảo]: "${item.sample_answer}"`;
+        }
+      }).join('\n');
+
+      return `Hãy đóng vai giáo viên tiếng Anh bản xứ chấm điểm đoạn hội thoại luyện phản xạ (Free Chat) dưới đây của tôi về chủ đề "${activeChat.title}" (Trình độ mục tiêu: ${activeChat.rank || 'B1'}).
+
+=== NỘI DUNG CUỘC HỘI THOẠI ===
+${lines}
+
+=== YÊU CẦU CHẤM ĐIỂM ===
+1. Kiểm tra ngữ pháp, chính tả và độ tự nhiên cho từng câu trả lời (My Reply) của tôi.
+2. Đánh giá xem câu trả lời của tôi có khớp ngữ cảnh với câu nói của đối phương và diễn đạt đúng [Ý tưởng mục tiêu] hay không.
+3. Với mỗi câu của tôi, hãy gợi ý 1-2 cách diễn đạt tự nhiên hơn (có sử dụng từ lóng, collocations hoặc câu ghép như người bản xứ).
+4. Chấm điểm tổng thể trên thang 10 và nhận xét ngắn gọn bằng tiếng Việt.`;
+    }
+
+    function copyFreeChatPrompt(btn) {
+      const text = buildFreeChatGradingPrompt();
+      navigator.clipboard.writeText(text).then(() => {
+        playSuccessChime();
+        btn.textContent = '✅ Đã Copy! Dán vào ChatGPT / Gemini để chấm';
+        btn.style.background = 'var(--accent-green)';
+        btn.style.color = '#000';
+      });
+    }
+
     function finishMessengerChat() {
       playSuccessChime();
       nativeCueBanner.style.display = 'none';
       finishOverlay.style.display = 'flex';
+
+      const titleEl = document.getElementById('finishTitle');
+      const descEl = document.getElementById('finishDesc');
+      const reviewBox = document.getElementById('freeReviewBox');
+      const actionsEl = document.getElementById('finishActions');
+
+      if (isFreeChatMode) {
+        titleEl.textContent = '🚀 Free Chat Completed!';
+        descEl.textContent = 'Copy toàn bộ hội thoại bên dưới và dán vào ChatGPT / Gemini / Claude để AI chấm ngữ pháp & độ tự nhiên:';
+        reviewBox.style.display = 'block';
+        reviewBox.textContent = buildFreeChatGradingPrompt();
+
+        actionsEl.innerHTML = `
+          <button class="btn-lib-action start" onclick="copyFreeChatPrompt(this)" style="max-width: 320px; padding: 0 18px;">📋 Copy Hội Thoại Để AI Chấm</button>
+          <button class="btn-lib-action import" onclick="confirmStartChatFromScript(true)">Free Chat Lại</button>
+          <button class="btn-lib-action" onclick="goToLibrary()">Library</button>
+        `;
+      } else {
+        titleEl.textContent = '🎉 Great Job!';
+        descEl.textContent = 'Bạn đã thuộc nhịp hội thoại! Thử sức với Free Chat để tự triển khai ý tưởng nhé:';
+        reviewBox.style.display = 'none';
+
+        actionsEl.innerHTML = `
+          <button class="btn-lib-action import" onclick="confirmStartChatFromScript(true)">🚀 Chuyển sang Free Chat</button>
+          <button class="btn-lib-action start" onclick="replayCurrentChat()">Luyện Lại</button>
+          <button class="btn-lib-action" onclick="deleteCurrentChat()">Xóa bài</button>
+          <button class="btn-lib-action" onclick="goToLibrary()">Library</button>
+        `;
+      }
     }
 
     function replayCurrentChat() {
       finishOverlay.style.display = 'none';
-      confirmStartChatFromScript();
+      confirmStartChatFromScript(isFreeChatMode);
     }
 
     function deleteCurrentChat() {
@@ -1946,48 +2218,116 @@ const inputBackdrop = document.getElementById('inputBackdrop');
 
     function loadSampleImport() {
       playHoverBlip();
-      const sample = [
-        {
-          speaker: "Cashier",
-          text_target: "Did you find everything you were looking for today?",
-          text_native: "Hôm nay bạn đã tìm thấy mọi thứ mình cần chưa?",
-          is_player: false
-        },
-        {
-          speaker: "Customer",
-          text_target: "Yes, everything was great. Do you take credit cards?",
-          text_native: "Vâng, mọi thứ đều tốt. Cửa hàng có nhận thẻ tín dụng không?",
-          is_player: true
-        },
-        {
-          speaker: "Cashier",
-          text_target: "Yes we do, please tap your card on the terminal.",
-          text_native: "Có ạ, xin mời bạn chạm thẻ vào máy thanh toán.",
-          is_player: false
-        },
-        {
-          speaker: "Customer",
-          text_target: "Done. Could I also get a paper receipt?",
-          text_native: "Xong rồi. Tôi có thể lấy hóa đơn giấy được không?",
-          is_player: true
-        }
-      ];
+      const sample = {
+        notebook: [
+          {
+            phrase: "tap your card on the terminal",
+            type: "Collocation",
+            meaning: "Chạm thẻ thanh toán không tiếp xúc vào máy POS."
+          },
+          {
+            phrase: "Yes, everything was great, do you take credit cards?",
+            type: "Compound Sentence",
+            meaning: "Nối hai vế xác nhận hài lòng và hỏi phương thức thanh toán liền mạch."
+          }
+        ],
+        turns: [
+          {
+            speaker: "Cashier",
+            text_target: "Did you find everything you were looking for today?",
+            text_native: "Hôm nay bạn đã tìm thấy mọi thứ mình cần chưa?",
+            is_player: false
+          },
+          {
+            speaker: "Customer",
+            text_target: "Yes, everything was great. Do you take credit cards?",
+            text_native: "Vâng, mọi thứ đều tốt. Cửa hàng có nhận thẻ tín dụng không?",
+            idea_prompt: "Xác nhận bạn đã chọn xong đồ và hỏi thu ngân xem có thanh toán bằng thẻ được không.",
+            is_player: true
+          },
+          {
+            speaker: "Cashier",
+            text_target: "Yes we do, please tap your card on the terminal.",
+            text_native: "Có ạ, xin mời bạn chạm thẻ vào máy thanh toán.",
+            is_player: false
+          },
+          {
+            speaker: "Customer",
+            text_target: "Done. Could I also get a paper receipt?",
+            text_native: "Xong rồi. Tôi có thể lấy hóa đơn giấy được không?",
+            idea_prompt: "Báo đã chạm thẻ xong và xin thêm hóa đơn giấy.",
+            is_player: true
+          }
+        ]
+      };
       document.getElementById('importJsonTextarea').value = JSON.stringify(sample, null, 2);
     }
 
-    function submitImportJson() {
+function submitImportJson() {
       const raw = document.getElementById('importJsonTextarea').value.trim();
       if (!raw) return;
 
       try {
-        const turns = JSON.parse(raw);
-        if (!Array.isArray(turns) || turns.length === 0) {
-          throw new Error('JSON must be an array of dialogue turns.');
+        // 1. Tự động tìm và cắt đúng khối JSON từ dấu { hoặc [ đầu tiên đến dấu } hoặc ] cuối cùng
+        // (Bỏ qua hoàn toàn lời chào, giải thích thừa hoặc thẻ ```json của AI)
+        const firstBrace = raw.indexOf('{');
+        const firstBracket = raw.indexOf('[');
+        let startIdx = -1;
+        let endIdx = -1;
+
+        if (firstBrace !== -1 && (firstBracket === -1 || firstBrace < firstBracket)) {
+          startIdx = firstBrace;
+          endIdx = raw.lastIndexOf('}');
+        } else if (firstBracket !== -1) {
+          startIdx = firstBracket;
+          endIdx = raw.lastIndexOf(']');
         }
 
-const db = getDB();
+        if (startIdx === -1 || endIdx === -1 || endIdx <= startIdx) {
+          throw new Error('Không tìm thấy dữ liệu JSON hợp lệ trong nội dung bạn dán.');
+        }
+
+        let jsonStr = raw.slice(startIdx, endIdx + 1);
+
+        // 2. Xóa lỗi dấu phẩy thừa trước dấu đóng } hoặc ] mà AI hay mắc phải
+        jsonStr = jsonStr.replace(/,\s*([}\]])/g, '$1');
+
+        const parsed = JSON.parse(jsonStr);
+
+        // 3. Chấp nhận linh hoạt nhiều tên trường nếu AI lỡ đặt khác nhẹ
+        const rawTurns = Array.isArray(parsed)
+          ? parsed
+          : (parsed.turns || parsed.dialogue || parsed.conversation || parsed.messages || []);
+
+        const rawNotebook = (!Array.isArray(parsed) && parsed)
+          ? (parsed.notebook || parsed.vocabulary || parsed.phrases || parsed.notes || [])
+          : [];
+
+        if (!Array.isArray(rawTurns) || rawTurns.length === 0) {
+          throw new Error('Không tìm thấy danh sách câu hội thoại (turns) trong JSON.');
+        }
+
+        // 4. Chuẩn hóa từng lượt thoại
+        const turns = rawTurns.map((t, idx) => ({
+          speaker: t.speaker || t.name || (idx % 2 === 0 ? 'Bob' : 'Laura'),
+          text_target: (t.text_target || t.english || t.target || t.text || '').trim(),
+          text_native: (t.text_native || t.vietnamese || t.native || t.translation || '').trim(),
+          idea_prompt: (t.idea_prompt || t.idea || t.hint || t.text_native || '').trim(),
+          is_player: typeof t.is_player === 'boolean' ? t.is_player : (idx % 2 === 1)
+        })).filter(t => t.text_target !== '');
+
+        // 5. Chuẩn hóa sổ tay từ lóng / câu ghép
+        const notebook = Array.isArray(rawNotebook)
+          ? rawNotebook.map(n => ({
+              phrase: (n.phrase || n.word || n.expression || n.term || '').trim(),
+              type: (n.type || n.category || 'Phrase').trim(),
+              meaning: (n.meaning || n.explanation || n.definition || '').trim()
+            })).filter(n => n.phrase !== '')
+          : [];
+
+        const db = getDB();
         const newId = (db.length > 0 ? Math.max(...db.map(x => x.id || 0)) : 0) + 1;
-        const firstSentence = (turns[0] && turns[0].text_target) ? turns[0].text_target.trim() : `Imported Chat #${newId}`;
+        const firstSentence = turns[0]?.text_target || `Imported Chat #${newId}`;
         const selectedRank = document.getElementById('promptLevelSelect')?.value || "B1";
 
         const newChat = {
@@ -1997,6 +2337,7 @@ const db = getDB();
           user_lang: "vietnamese",
           rank: selectedRank,
           about: "custom",
+          notebook: notebook,
           turns: turns
         };
 
@@ -2007,10 +2348,12 @@ const db = getDB();
         closeImportModal();
         selectedChatId = newId;
         renderLibraryList();
-      } catch(err) {
-        alert('Invalid JSON: ' + err.message);
+      } catch (err) {
+        alert('Lỗi định dạng JSON: ' + err.message);
       }
     }
+
+
 
     function escapeHTML(str) {
       return (str || '').replace(/[&<>'"]/g, tag => ({
